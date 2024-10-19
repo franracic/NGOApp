@@ -1,0 +1,15 @@
+export const colors = {
+  purpleLight: "#8D5CE5",
+  purpleBase: "#371687",
+  purpleDark: "#1B004C",
+  magentaBase: "#FF2498",
+  error: "#FF2498",
+  purpleSecond: "#3F00B2",
+  yellowBase: "#FFF200",
+  yellowLight: "#fce792",
+  yellowDark: "#ECD006",
+  yellowInput: "#fef8e0",
+  yellowBg: "rgba(252, 231, 146, 0.7)",
+  backgroundGray: "#f3f4f6",
+  grayBase: "#9ca3af",
+};

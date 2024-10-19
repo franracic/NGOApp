@@ -1,0 +1,38 @@
+{
+  "name": "oui-platforma",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@faker-js/faker": "^8.4.1",
+    "axios": "^1.7.5",
+    "framer-motion": "^11.3.21",
+    "next": "14.2.5",
+    "react": "^18",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-dom": "^18",
+    "react-easy-crop": "^5.0.8",
+    "react-pdf": "^9.1.0",
+    "react-pdf-js": "^5.1.0",
+    "react-player": "^2.16.0",
+    "swr": "^2.2.5",
+    "typeface-noto-sans": "^1.1.13"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-beautiful-dnd": "^13.1.8",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
+    "typescript": "^5"
+  }
+}
