@@ -1,26 +1,13 @@
 from django.contrib import admin
-from .models import IAuthor, ICourse, ICourseContent, ICourseSection
+from .models import ICourse, ICourseSection, ICourseContent, IAuthor, UserCourseProgress
 
-@admin.register(IAuthor)
-class IAuthorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email')
-    search_fields = ('name', 'email')
+admin.site.register(ICourse)
+admin.site.register(ICourseSection)
+admin.site.register(ICourseContent)
+admin.site.register(IAuthor)
 
-@admin.register(ICourseContent)
-class ICourseContentAdmin(admin.ModelAdmin):
-    list_display = ('title', 'type')
-    list_filter = ('type',)
-    search_fields = ('title',)
-
-@admin.register(ICourse)
-class ICourseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'average_rating', 'total_duration', 'isUnlocked', 'type')
-    list_filter = ('isUnlocked', 'type')
-    search_fields = ('title', 'description')
-
-@admin.register(ICourseSection)
-class ICourseSectionAdmin(admin.ModelAdmin):
-    list_display = ('title', 'course')
-    search_fields = ('title',)
-    list_filter = ('course',)
-
+@admin.register(UserCourseProgress)
+class UserCourseProgressAdmin(admin.ModelAdmin):
+    list_display = ('user', 'course', 'is_unlocked', 'is_completed', 'progress')
+    list_filter = ('is_unlocked', 'is_completed')
+    search_fields = ('user__username', 'course__title')

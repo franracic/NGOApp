@@ -108,7 +108,7 @@ export const DashboarIntro = ({
               rounded="2xl"
             >
               <Text fontSize="20px" fontWeight="bold" color={textColor}>
-                {user.activityLevel || 0}
+                {user.completedCourses?.length || "No courses"}
               </Text>
               <Text
                 fontSize="smaller"
@@ -117,7 +117,7 @@ export const DashboarIntro = ({
                 overflow="hidden"
                 textOverflow="ellipsis"
               >
-                Active Courses
+                Completed Courses
               </Text>
               <Box
                 position="absolute"
@@ -146,7 +146,7 @@ export const DashboarIntro = ({
               rounded="2xl"
             >
               <Text fontSize="20px" fontWeight="bold" color={textColor}>
-                {user.connectionsCount || 0}
+                {user.connectionsCount || "No connections"}
               </Text>
               <Text
                 fontSize="smaller"
@@ -262,7 +262,7 @@ export const DashboarIntro = ({
               rounded="2xl"
             >
               <Text fontSize="20px" fontWeight="bold" color={textColor}>
-                {user.events ? user.events.length : 0}
+                {user.events ? user.events.length : "No events"}
               </Text>
               <Text
                 fontSize="smaller"

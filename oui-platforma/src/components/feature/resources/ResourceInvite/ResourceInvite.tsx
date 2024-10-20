@@ -1,7 +1,6 @@
-import { fetcher } from "@/fetchers/fetcher";
 import { newResources } from "@/fetchers/resources";
 import { swrKeys } from "@/fetchers/swrKeys";
-import { IResource, IUser } from "@/typings/course";
+import { INewResource, IUser } from "@/typings/course"; // Use INewResource now
 import {
   Box,
   Button,
@@ -26,30 +25,34 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
-export const ResourceInvite = () => {
+export const categoryOptions = [
+  "Education",
+  "Technology",
+  "Health",
+  "Science",
+  "Arts",
+  "Business",
+  "Environment",
+  "Other",
+];
+
+export const ResourceInvite = ({ currentUser }: { currentUser: IUser }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
-  // Fetch current user
-  const { data: currentUser, error: userError } = useSWR(
-    swrKeys.currentUser,
-    fetcher<IUser>
-  );
-
-  // Define initial state for new resource
-  const [newResource, setNewResource] = useState<IResource>({
-    id: 0,
+  const [newResource, setNewResource] = useState<INewResource>({
     title: "",
     description: "",
     link: "",
-    level: 1,
     type: "Article",
-    createdBy: currentUser ? currentUser.id : 0,
-    createdAt: new Date(),
+    language: "",
+    category: "",
     tags: [],
+    views: 0,
+    likes: [],
+    isOfficial: false,
   });
 
   // Handle input changes
@@ -62,13 +65,11 @@ export const ResourceInvite = () => {
     setNewResource({ ...newResource, [name]: value });
   };
 
-  // Handle tags change (comma-separated)
   const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const tagsValue = e.target.value.split(",").map((tag) => tag.trim());
     setNewResource({ ...newResource, tags: tagsValue });
   };
 
-  // Mutation for adding the resource
   const { trigger: addResource } = useSWRMutation(
     swrKeys.resources,
     async () => {
@@ -86,15 +87,16 @@ export const ResourceInvite = () => {
           isClosable: true,
         });
         setNewResource({
-          id: 0,
           title: "",
           description: "",
           link: "",
-          level: 1,
           type: "Article",
-          createdBy: currentUser ? currentUser.id : 0,
-          createdAt: new Date(),
+          language: "",
+          category: "",
           tags: [],
+          views: 0,
+          likes: [],
+          isOfficial: false,
         });
         onClose();
       },
@@ -110,7 +112,6 @@ export const ResourceInvite = () => {
     }
   );
 
-  // Handle add resource button click
   const handleAddResource = () => {
     if (!currentUser) {
       toast({
@@ -125,19 +126,8 @@ export const ResourceInvite = () => {
     addResource();
   };
 
-  if (userError) {
-    toast({
-      title: "Error Loading User Data",
-      description: "An error occurred while loading user data.",
-      status: "error",
-      duration: 5000,
-      isClosable: true,
-    });
-    return null;
-  }
-
   if (!currentUser) {
-    return null; // Prevent rendering until user data is loaded
+    return null;
   }
 
   return (
@@ -258,12 +248,23 @@ export const ResourceInvite = () => {
                 <option value="Other">Other</option>
               </Select>
               <Input
-                type="number"
-                placeholder="Level"
-                name="level"
-                value={newResource.level}
+                placeholder="Language"
+                name="language"
+                value={newResource.language}
                 onChange={handleInputChange}
               />
+              <Select
+                placeholder="Select Category"
+                name="category"
+                value={newResource.category}
+                onChange={handleInputChange}
+              >
+                {categoryOptions.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </Select>
               <Input
                 placeholder="Tags (comma-separated)"
                 name="tags"

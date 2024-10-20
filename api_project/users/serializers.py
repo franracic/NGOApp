@@ -3,6 +3,13 @@ from .models import User, IGroup, IActivity
 
 from django.contrib.auth.hashers import make_password
 
+class BasicUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'name', 'avatar', 'city', 'country', 'jobTitle', 'bio', 'role'
+        ]
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

@@ -1,4 +1,9 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+User = get_user_model()
 
 class IAuthor(models.Model):
     name = models.CharField(max_length=100)
@@ -51,3 +56,23 @@ class ICourseSection(models.Model):
 
     def __str__(self):
         return self.title
+    
+class UserCourseProgress(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course_progress')
+    course = models.ForeignKey(ICourse, on_delete=models.CASCADE, related_name='user_progress')
+    is_unlocked = models.BooleanField(default=False)
+    is_completed = models.BooleanField(default=False)
+    progress = models.FloatField(default=0)
+
+    class Meta:
+        unique_together = ('user', 'course')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.course.title}"
+
+@receiver(post_save, sender=User)
+def unlock_initial_courses(sender, instance, created, **kwargs):
+    if created:
+        initial_courses = ICourse.objects.all().order_by('id')[:3]
+        for course in initial_courses:
+            UserCourseProgress.objects.create(user=instance, course=course, is_unlocked=True)

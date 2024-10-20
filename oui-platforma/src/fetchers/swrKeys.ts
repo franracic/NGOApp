@@ -16,4 +16,7 @@ export const swrKeys = {
     return `${apiUrl}/courses/courses/${id}/`;
   },
   resources: `${apiUrl}/networking/resources/`,
+  resource: (id: number) => `${apiUrl}/networking/resources/${id}/`,
+  lectures: `${apiUrl}/courses/courses/lectures/`,
+  workshops: `${apiUrl}/courses/courses/workshops/`,
 };

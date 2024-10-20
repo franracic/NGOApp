@@ -32,16 +32,22 @@ export interface IAuthor {
   externalLink?: string;
 }
 
-export interface IResource {
-  id: number;
+export interface INewResource {
   title: string;
   description: string;
   link: string;
-  level: number;
   type: string;
-  createdBy: number;
-  createdAt: Date;
+  language: string;
+  category: string;
   tags?: string[];
+  views: number;
+  likes: number[];
+  isOfficial: boolean;
+}
+export interface IResource extends INewResource {
+  id: number;
+  createdBy: IUser;
+  createdAt: Date;
 }
 
 export interface IUser {
@@ -73,6 +79,8 @@ export interface IUser {
   events?: IEvent[];
   groups?: IGroup[];
   trophies?: ITrophy[];
+  likedResources?: number[];
+  completedCourses?: number[];
 }
 
 export interface IChallenge {
@@ -132,24 +140,6 @@ export interface IQuizQuestion {
   question: string;
   options: string[];
   correctAnswer: string;
-}
-
-export interface IReview {
-  user: {
-    email: string;
-    avatar: string;
-    username: string;
-  };
-  rating: number;
-  comment: string;
-  id: string;
-  show_id: string;
-}
-
-export interface INewReview {
-  rating: number;
-  comment: string;
-  show_id: string;
 }
 
 export interface ICourseSection {

@@ -5,15 +5,20 @@ from .views import (
     IAuthorViewSet,
     ICourseContentViewSet,
     ICourseSectionViewSet,
+    LectureViewSet,
+    WorkshopViewSet,
+    ExamViewSet,
 )
 
 router = DefaultRouter()
 router.register(r'courses', ICourseViewSet)
 router.register(r'authors', IAuthorViewSet)
 router.register(r'course-contents', ICourseContentViewSet)
+router.register(r'lectures', LectureViewSet, basename='lecture')
+router.register(r'workshops', WorkshopViewSet, basename='workshop')
+router.register(r'exams', ExamViewSet, basename='exam')
 
 course_section_list = ICourseSectionViewSet.as_view({'get': 'list', 'post': 'create'})
-
 
 urlpatterns = [
     path('', include(router.urls)),

@@ -1,5 +1,6 @@
 "use client";
-import { WorkShopSection } from "@/components/feature/courses/WorkshopsSection/WorkShopsSection";
+
+import { WorkshopSection } from "@/components/feature/courses/WorkshopsSection/WorkShopsSection";
 import { mockCourses } from "@/components/feature/mock/mockCourses";
 import { Spinner, VStack } from "@chakra-ui/react";
 
@@ -11,5 +12,5 @@ export default function Page() {
       </VStack>
     );
   }
-  return <WorkShopSection {...mockCourses} />;
+  return <WorkshopSection />;
 }

@@ -1,7 +1,7 @@
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import User, IGroup, IActivity
-from .serializers import UserSerializer, IGroupSerializer, IActivitySerializer
+from .serializers import UserSerializer, BasicUserSerializer, IGroupSerializer, IActivitySerializer
 from .filters import UserFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
@@ -32,6 +32,11 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ['username', 'bio', 'expertise']
     ordering_fields = ['level', 'experiencePoints', 'connectionsCount']
     permission_classes = [AllowAny]
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return BasicUserSerializer
+        return super().get_serializer_class()
 
 class IGroupViewSet(viewsets.ModelViewSet):
     queryset = IGroup.objects.all()
@@ -67,12 +72,13 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        username = request.data.get('email').split('@')[0]
+        email = request.data.get('email')
         password = request.data.get('password')
 
-        if not username or not password:
+        if not email or not password:
             return Response({"detail": "Email and password are required."}, status=status.HTTP_400_BAD_REQUEST)
 
+        username = email.split('@')[0]
         user = authenticate(username=username, password=password)
 
         if user is not None:
@@ -99,7 +105,6 @@ class RegisterView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         request.data["name"] = request.data["username"]
         request.data["username"] = request.data["email"].split('@')[0]
-
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

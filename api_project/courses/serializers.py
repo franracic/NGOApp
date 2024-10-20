@@ -1,5 +1,14 @@
 from rest_framework import serializers
-from .models import ICourse, ICourseContent, ICourseSection, IAuthor
+from .models import ICourse, ICourseContent, ICourseSection, IAuthor, UserCourseProgress
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class UserCourseProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserCourseProgress
+        fields = ['is_unlocked', 'is_completed', 'progress']
+
 
 class IAuthorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,14 +39,48 @@ class ICourseSectionSerializer(serializers.ModelSerializer):
         section.contents.set(contents)
 
         return section
+    
 
 class ICourseSerializer(serializers.ModelSerializer):
     sections = ICourseSectionSerializer(many=True, required=False)
     authors = IAuthorSerializer(many=True, required=False)
-    
+    is_unlocked = serializers.SerializerMethodField()
+    is_completed = serializers.SerializerMethodField()
+    progress = serializers.SerializerMethodField()
+
     class Meta:
         model = ICourse
         fields = '__all__'
+
+    def get_is_unlocked(self, obj):
+        user = self.context.get('request').user
+        if not user.is_authenticated:
+            return False
+        try:
+            progress = UserCourseProgress.objects.get(user=user, course=obj)
+            return progress.is_unlocked
+        except UserCourseProgress.DoesNotExist:
+            return False
+
+    def get_is_completed(self, obj):
+        user = self.context.get('request').user
+        if not user.is_authenticated:
+            return False
+        try:
+            progress = UserCourseProgress.objects.get(user=user, course=obj)
+            return progress.is_completed
+        except UserCourseProgress.DoesNotExist:
+            return False
+
+    def get_progress(self, obj):
+        user = self.context.get('request').user
+        if not user.is_authenticated:
+            return 0
+        try:
+            progress = UserCourseProgress.objects.get(user=user, course=obj)
+            return progress.progress
+        except UserCourseProgress.DoesNotExist:
+            return 0
 
     def create(self, validated_data):
         authors_data = validated_data.pop('authors', [])
