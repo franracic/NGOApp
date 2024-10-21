@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ICourse, ICourseContent, ICourseSection, IAuthor, UserCourseProgress
+from .models import ICourse, ICourseContent, ICourseSection, IAuthor, UserCourseContentProgress, UserCourseProgress
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -16,9 +16,17 @@ class IAuthorSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ICourseContentSerializer(serializers.ModelSerializer):
+    is_completed = serializers.SerializerMethodField()
+
     class Meta:
         model = ICourseContent
         fields = '__all__'
+
+    def get_is_completed(self, obj):
+        user = self.context.get('request').user
+        if not user.is_authenticated:
+            return False
+        return UserCourseContentProgress.objects.filter(user=user, content=obj, is_completed=True).exists()
 
 class ICourseSectionSerializer(serializers.ModelSerializer):
     contents = ICourseContentSerializer(many=True, required=False)
@@ -50,32 +58,40 @@ class ICourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ICourse
-        fields = '__all__'
+        fields = [
+            'id',
+            'title',
+            'cover_image',
+            'average_rating',
+            'description',
+            'authors',
+            'total_duration',
+            'is_unlocked',
+            'is_completed',
+            'progress',
+            'course',
+            'type',
+            'sections',
+            'order',
+        ]
 
     def get_is_unlocked(self, obj):
         user = self.context.get('request').user
         if not user.is_authenticated:
             return False
-        try:
-            progress = UserCourseProgress.objects.get(user=user, course=obj)
-            return progress.is_unlocked
-        except UserCourseProgress.DoesNotExist:
-            return False
+        return UserCourseProgress.objects.filter(user=user, course=obj, is_unlocked=True).exists()
 
     def get_is_completed(self, obj):
         user = self.context.get('request').user
         if not user.is_authenticated:
             return False
-        try:
-            progress = UserCourseProgress.objects.get(user=user, course=obj)
-            return progress.is_completed
-        except UserCourseProgress.DoesNotExist:
-            return False
+        return UserCourseProgress.objects.filter(user=user, course=obj, is_completed=True).exists()
 
     def get_progress(self, obj):
         user = self.context.get('request').user
         if not user.is_authenticated:
             return 0
+
         try:
             progress = UserCourseProgress.objects.get(user=user, course=obj)
             return progress.progress

@@ -28,6 +28,14 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({
   const [score, setScore] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isPassed, setIsPassed] = useState(false);
+  if (!quizData) {
+    return (
+      <Alert status="warning" variant="solid" mt={6}>
+        <AlertIcon />
+        No quiz questions found.
+      </Alert>
+    );
+  }
 
   const currentQuestion = quizData[currentQuestionIndex];
 

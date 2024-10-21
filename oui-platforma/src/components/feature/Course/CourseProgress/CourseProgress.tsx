@@ -4,12 +4,10 @@ import React from "react";
 
 interface CourseProgressProps {
   courseSections: ICourseSection[];
-  completedVideos: Set<string>;
 }
 
 export const CourseProgress: React.FC<CourseProgressProps> = ({
   courseSections,
-  completedVideos,
 }) => {
   const totalContents = courseSections.reduce(
     (acc, section) => acc + section.contents.length,
@@ -17,9 +15,7 @@ export const CourseProgress: React.FC<CourseProgressProps> = ({
   );
   const completedCount = courseSections.reduce(
     (acc, section) =>
-      acc +
-      section.contents.filter((content) => completedVideos.has(content.title))
-        .length,
+      acc + section.contents.filter((content) => content.is_completed).length,
     0
   );
   const completionPercentage = (completedCount / totalContents) * 100;

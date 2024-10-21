@@ -41,7 +41,7 @@ export const FormComponent: React.FC<FormComponentProps> = ({
       <Heading size="md" mb={4}>
         (Optional) Please fill out the following form:
       </Heading>
-      {formFields.map((field, index) => (
+      {formFields?.map((field, index) => (
         <FormControl key={index} mb={4}>
           <FormLabel>{field.label}</FormLabel>
           {field.type === "text" && (

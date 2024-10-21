@@ -3,32 +3,30 @@ import { fetcher } from "@/fetchers/fetcher";
 import { swrKeys } from "@/fetchers/swrKeys";
 import { ICourse } from "@/typings/course";
 import { Box, Flex, Heading, SimpleGrid } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { CourseCard } from "../CourseCard/CourseCard";
 
 export const WorkshopSection = () => {
-  const {
-    data: workshops,
-    error: workshopsError,
-    isLoading: isWorkshopsLoading,
-  } = useSWR(swrKeys.workshops, fetcher<ICourse[]>);
+  const { data: workshops, error: workshopsError } = useSWR(
+    swrKeys.workshops,
+    fetcher<ICourse[]>
+  );
+  const { data: exams, error: examsError } = useSWR(
+    swrKeys.exams,
+    fetcher<ICourse[]>
+  );
+  console.log(swrKeys.workshops, swrKeys.exams);
 
-  const [inProgressWorkshops, setInProgressWorkshops] = useState<ICourse[]>([]);
-  const [completedWorkshops, setCompletedWorkshops] = useState<ICourse[]>([]);
-
-  useEffect(() => {
-    if (workshops) {
-      const inProgress = workshops.filter((course) => !course.completed);
-      const completed = workshops.filter((course) => course.completed);
-
-      setInProgressWorkshops(inProgress);
-      setCompletedWorkshops(completed);
-    }
-  }, [workshops]);
-
-  if (isWorkshopsLoading) return <div>Loading workshops...</div>;
-  if (workshopsError) return <div>Failed to load workshops.</div>;
+  if (workshopsError || examsError) return <div>Failed to load lectures.</div>;
+  if (!workshops && !exams) return <div>Loading lectures...</div>;
+  const inProgressLectures = [
+    ...(workshops?.filter((course) => !course.is_completed) || []),
+    ...(exams?.filter((course) => !course.is_completed) || []),
+  ];
+  const completedLectures = [
+    ...(workshops?.filter((course) => course.is_completed) || []),
+    ...(exams?.filter((course) => course.is_completed) || []),
+  ];
 
   return (
     <Flex direction="column" justifyContent="center" pb={8}>
@@ -39,26 +37,26 @@ export const WorkshopSection = () => {
         img_url="https://images.unsplash.com/photo-1659301254614-8d6a9d46f26a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
       />
 
-      {inProgressWorkshops.length > 0 && (
+      {inProgressLectures.length > 0 && (
         <Box p={4}>
           <Heading size="lg" mb={4}>
             In-progress Workshops
           </Heading>
           <SimpleGrid columns={[1, 2, 3, 4]} spacing={6}>
-            {inProgressWorkshops.map((course) => (
+            {inProgressLectures.map((course) => (
               <CourseCard key={course.id} {...course} link={true} />
             ))}
           </SimpleGrid>
         </Box>
       )}
 
-      {completedWorkshops.length > 0 && (
+      {completedLectures.length > 0 && (
         <Box p={4} mt={8}>
           <Heading size="lg" mb={4}>
             Completed Workshops
           </Heading>
           <SimpleGrid columns={[1, 2, 3, 4]} spacing={6}>
-            {completedWorkshops.map((course) => (
+            {completedLectures.map((course) => (
               <CourseCard key={course.id} {...course} link={false} />
             ))}
           </SimpleGrid>

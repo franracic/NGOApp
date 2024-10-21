@@ -19,7 +19,7 @@
 //   const [unlockedCourses, setUnlockedCourses] = useState(
 //     courseSections.map((section, index) => ({
 //       ...section,
-//       isUnlocked: index === 0,
+//       is_unlocked: index === 0,
 //     }))
 //   );
 
@@ -62,7 +62,7 @@
 //     const nextSectionIndex = completedSections.length;
 //     if (nextSectionIndex < unlockedCourses.length) {
 //       const updatedCourses = [...unlockedCourses];
-//       updatedCourses[nextSectionIndex].isUnlocked = true;
+//       updatedCourses[nextSectionIndex].is_unlocked = true;
 //       setUnlockedCourses(updatedCourses);
 //     }
 //   };

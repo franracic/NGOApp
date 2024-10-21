@@ -11,6 +11,9 @@ class IAuthor(models.Model):
     avatar = models.URLField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
 class ICourseContent(models.Model):
     content_type_choices = [
         ("pdf", "PDF"),
@@ -31,6 +34,9 @@ class ICourseContent(models.Model):
     duration = models.CharField(max_length=50, null=True, blank=True)
     transcript = models.TextField(null=True, blank=True)
 
+    def __str__(self):
+        return self.title
+
 class ICourse(models.Model):
     title = models.CharField(max_length=100)
     cover_image = models.URLField(null=True, blank=True)
@@ -38,20 +44,26 @@ class ICourse(models.Model):
     description = models.TextField(null=True, blank=True)
     authors = models.ManyToManyField(IAuthor, blank=True)
     total_duration = models.CharField(max_length=50, default="Unknown")
-    isUnlocked = models.BooleanField(default=False)
-    course = models.TextField(null=True, blank=True)
+    ROLE_CHOICES = [
+        ('worker', 'Worker'),
+        ('practitioner', 'Practitioner'),
+        ('mentor', 'Mentor'),
+    ]
+    course = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    order = models.PositiveIntegerField(default=0)
     type_choices = [
         ("Lecture", "Lecture"),
         ("Workshop", "Workshop"),
         ("Exam", "Exam"),
     ]
     type = models.CharField(choices=type_choices, max_length=10)
+
     def __str__(self):
         return self.title
 
 class ICourseSection(models.Model):
     title = models.CharField(max_length=100)
-    contents = models.ManyToManyField(ICourseContent, blank=True)
+    contents = models.ManyToManyField(ICourseContent, blank=True, related_name='sections')
     course = models.ForeignKey(ICourse, related_name='sections', on_delete=models.CASCADE)
 
     def __str__(self):
@@ -69,10 +81,21 @@ class UserCourseProgress(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.course.title}"
+    
+class UserCourseContentProgress(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='content_progress')
+    content = models.ForeignKey(ICourseContent, on_delete=models.CASCADE, related_name='user_progress')
+    is_completed = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('user', 'content')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.content.title}"
 
 @receiver(post_save, sender=User)
 def unlock_initial_courses(sender, instance, created, **kwargs):
     if created:
-        initial_courses = ICourse.objects.all().order_by('id')[:3]
+        initial_courses = ICourse.objects.filter(course=instance.role).order_by('order')[:3]
         for course in initial_courses:
             UserCourseProgress.objects.create(user=instance, course=course, is_unlocked=True)

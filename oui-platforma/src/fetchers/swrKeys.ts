@@ -17,6 +17,12 @@ export const swrKeys = {
   },
   resources: `${apiUrl}/networking/resources/`,
   resource: (id: number) => `${apiUrl}/networking/resources/${id}/`,
-  lectures: `${apiUrl}/courses/courses/lectures/`,
-  workshops: `${apiUrl}/courses/courses/workshops/`,
+  lectures: `${apiUrl}/courses/lectures/`,
+  workshops: `${apiUrl}/courses/workshops/`,
+  exams: `${apiUrl}/courses/exams/`,
+  completeCourse(id: number) {
+    return `${apiUrl}/courses/courses/${id}/complete/`;
+  },
+  completeContent: (id: number) =>
+    `${apiUrl}/courses/course-contents/${id}/complete/`,
 };

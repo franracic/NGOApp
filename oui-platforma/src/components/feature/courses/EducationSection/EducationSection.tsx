@@ -3,32 +3,22 @@ import { fetcher } from "@/fetchers/fetcher";
 import { swrKeys } from "@/fetchers/swrKeys";
 import { ICourse } from "@/typings/course";
 import { Box, Flex, Heading, SimpleGrid } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { CourseCard } from "../CourseCard/CourseCard";
 
 export const EducationSection = () => {
-  const {
-    data: lectures,
-    error: lecturesError,
-    isLoading: isLecturesLoading,
-  } = useSWR(swrKeys.lectures, fetcher<ICourse[]>);
+  const { data: lectures, error: lecturesError } = useSWR(
+    swrKeys.lectures,
+    fetcher<ICourse[]>
+  );
 
-  const [inProgressLectures, setInProgressLectures] = useState<ICourse[]>([]);
-  const [completedLectures, setCompletedLectures] = useState<ICourse[]>([]);
-
-  useEffect(() => {
-    if (lectures) {
-      const inProgress = lectures.filter((course) => !course.completed);
-      const completed = lectures.filter((course) => course.completed);
-
-      setInProgressLectures(inProgress);
-      setCompletedLectures(completed);
-    }
-  }, [lectures]);
-
-  if (isLecturesLoading) return <div>Loading lectures...</div>;
+  if (!lectures) return <div>Loading lectures...</div>;
   if (lecturesError) return <div>Failed to load lectures.</div>;
+
+  console.log(lectures);
+
+  const inProgressLectures = lectures.filter((course) => !course.is_completed);
+  const completedLectures = lectures.filter((course) => course.is_completed);
 
   return (
     <Flex direction="column" justifyContent="center" pb={8}>
@@ -36,7 +26,7 @@ export const EducationSection = () => {
         headingText="Education"
         subheadingText="Unlock Your Potential"
         bodyText="Explore a wide range of educational resources to boost your knowledge and skills."
-        img_url="https://images.unsplash.com/photo-1496307653780-42ee777d4833?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        img_url="https://images.unsplash.com/photo-1496307653780-42ee777d4833?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3"
       />
 
       {inProgressLectures.length > 0 && (

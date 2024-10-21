@@ -31,3 +31,19 @@ export function updateCourse(courseId: number, course: ICourse) {
     body: JSON.stringify(course),
   });
 }
+
+export function getCourseById(courseId: number) {
+  return fetcher<ICourse>(swrKeys.editCourse(courseId));
+}
+
+export function completeCourse(courseId: number) {
+  return fetcher(swrKeys.completeCourse(courseId), {
+    method: "POST",
+  });
+}
+
+export function completeContent(contentId: number) {
+  return fetcher(swrKeys.completeContent(contentId), {
+    method: "POST",
+  });
+}

@@ -15,8 +15,8 @@ router.register(r'courses', ICourseViewSet)
 router.register(r'authors', IAuthorViewSet)
 router.register(r'course-contents', ICourseContentViewSet)
 router.register(r'lectures', LectureViewSet, basename='lecture')
-router.register(r'workshops', WorkshopViewSet, basename='workshop')
 router.register(r'exams', ExamViewSet, basename='exam')
+router.register(r'workshops', WorkshopViewSet, basename='workshop')
 
 course_section_list = ICourseSectionViewSet.as_view({'get': 'list', 'post': 'create'})
 

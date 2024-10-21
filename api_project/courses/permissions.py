@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
-from .models import UserCourseProgress
+from .models import ICourse, UserCourseProgress
 
 class IsCourseUnlocked(BasePermission):
 
@@ -37,3 +37,13 @@ class IsAdminUserOrReadOnly(BasePermission):
             request.method in SAFE_METHODS or
             (request.user and request.user.is_staff)
         )
+
+class IsContentAccessible(BasePermission):
+    message = 'You do not have access to this content.'
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        if not user.is_authenticated:
+            return False
+        courses = ICourse.objects.filter(sections__contents=obj).distinct()
+        return UserCourseProgress.objects.filter(user=user, course__in=courses, is_unlocked=True).exists()

@@ -16,14 +16,12 @@ interface CourseContentSidebarProps {
   courseSections: ICourseSection[];
   selectedContent: ICourseContent;
   setSelectedContent: (content: ICourseContent) => void;
-  completedVideos: Set<string>;
 }
 
 export const CourseContentSidebar: React.FC<CourseContentSidebarProps> = ({
   courseSections,
   selectedContent,
   setSelectedContent,
-  completedVideos,
 }) => {
   return (
     <Box
@@ -37,10 +35,7 @@ export const CourseContentSidebar: React.FC<CourseContentSidebarProps> = ({
       <Heading as="h3" size="lg" mb={4}>
         Course Content
       </Heading>
-      <CourseProgress
-        courseSections={courseSections}
-        completedVideos={completedVideos}
-      />
+      <CourseProgress courseSections={courseSections} />
       {courseSections.map((section, sectionIdx) => (
         <Box key={sectionIdx} mb={6}>
           <Heading as="h4" size="md" mb={2}>
@@ -60,7 +55,7 @@ export const CourseContentSidebar: React.FC<CourseContentSidebarProps> = ({
                 py={2}
                 px={4}
                 bg={
-                  selectedContent.title === content.title
+                  selectedContent.id === content.id
                     ? "yellowLight"
                     : "transparent"
                 }
@@ -72,9 +67,9 @@ export const CourseContentSidebar: React.FC<CourseContentSidebarProps> = ({
                     {content.duration}
                   </Text>
                 )}
-                {completedVideos.has(content.title) && (
+                {content.is_completed ? (
                   <FaCheckCircle color="green.500" />
-                )}
+                ) : null}
               </HStack>
             ))}
           </VStack>

@@ -39,10 +39,10 @@ export const CourseForm = ({ courseId }: { courseId?: string }) => {
     average_rating: 0,
     authors: [],
     total_duration: "",
-    isUnlocked: true,
+    is_unlocked: true,
     sections: [],
     type: "Lecture",
-    id: "",
+    id: 0,
     course: "",
     completed: 0,
     contentCount: 0,
@@ -361,7 +361,7 @@ export const CourseForm = ({ courseId }: { courseId?: string }) => {
             formData.total_duration != "" ? formData.total_duration : "1h 30m"
           }
           type={formData.type}
-          isUnlocked={true}
+          is_unlocked={true}
           link={false}
           sections={[]}
         />

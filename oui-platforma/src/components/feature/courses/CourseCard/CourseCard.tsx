@@ -1,7 +1,7 @@
 import RatingText from "@/components/shared/RatingText/RatingText";
 import TotalDurationText from "@/components/shared/RatingText/TotalDurationText";
 import { ICourse } from "@/typings/course";
-import { LockIcon } from "@chakra-ui/icons";
+import { CheckCircleIcon, LockIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
@@ -21,7 +21,6 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { AuthorCardTooltip } from "../AuthorCardTooltip/AuthorCardTooltip";
-import { useCompletedVideos } from "../CompletedVideosContext/CompletedVideosContext";
 
 const placeholderImage = "https://fakeimg.pl/600x400?text=No+image";
 
@@ -41,32 +40,23 @@ export const CourseCard = ({
   total_duration,
   type,
   course = "STEM Youth Worker",
-  isUnlocked,
+  is_unlocked,
   link = true,
   onComplete,
   sections,
   loading = false,
+  progress = 0,
+  is_completed,
 }: ICourseCardProps) => {
-  const { completedVideos } = useCompletedVideos();
-
-  const totalVideos = sections?.flatMap((section) => section.contents).length;
-  const completedVideoCount =
-    sections
-      ?.flatMap((section) => section.contents)
-      .filter((video) => completedVideos.has(video.title)).length ?? 0;
-  const completionPercentage = totalVideos
-    ? Math.round((completedVideoCount / totalVideos) * 100)
-    : 0;
-
   return (
     <Tooltip
       label="Complete previous sections to unlock this course."
-      isDisabled={isUnlocked}
+      isDisabled={is_unlocked}
       placement="top"
     >
-      <Box {...(isUnlocked ? {} : { cursor: "not-allowed" })}>
+      <Box {...(is_unlocked ? {} : { cursor: "not-allowed" })}>
         <Card
-          {...(isUnlocked && link && !loading
+          {...(is_unlocked && link && !loading
             ? {
                 as: NextLink,
                 href:
@@ -81,7 +71,7 @@ export const CourseCard = ({
           flexGrow={1}
           minWidth={0}
           data-testid="course-card"
-          opacity={isUnlocked ? 1 : 0.5}
+          opacity={is_unlocked ? 1 : 0.5}
           position="relative"
         >
           {loading ? (
@@ -106,22 +96,26 @@ export const CourseCard = ({
               borderRadius="md"
               bg={"yellowBg"}
             >
-              {!isUnlocked ? (
+              {!is_unlocked ? (
                 <>
                   <LockIcon boxSize={20} />
                   <Text>Locked</Text>
                 </>
+              ) : is_completed ? (
+                <Tooltip label="Completed">
+                  <Box textAlign="center">
+                    <CheckCircleIcon boxSize={"100px"} color="yellowDark" />
+                  </Box>
+                </Tooltip>
               ) : (
                 <Box>
-                  <Tooltip label={`${completionPercentage}% completed`}>
+                  <Tooltip label={`${progress}% completed`}>
                     <CircularProgress
-                      value={completionPercentage}
+                      value={progress}
                       color="yellowDark"
                       size="100px"
                     >
-                      <CircularProgressLabel>
-                        {completionPercentage}%
-                      </CircularProgressLabel>
+                      <CircularProgressLabel>{progress}%</CircularProgressLabel>
                     </CircularProgress>
                   </Tooltip>
                 </Box>

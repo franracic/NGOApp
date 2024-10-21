@@ -3,16 +3,18 @@ export interface ICourse {
   cover_image?: string;
   average_rating?: number;
   description?: string;
-  id: string;
+  id: number;
   no_of_reviews?: number;
   authors?: IAuthor[];
   total_duration?: string;
-  isUnlocked?: boolean;
+  is_unlocked?: boolean;
+  is_completed?: boolean;
   sections: ICourseSection[];
   course?: string;
   type: "Lecture" | "Workshop" | "Exam";
   completed?: number;
   contentCount?: number;
+  progress?: number;
 }
 
 export interface Video {
@@ -148,6 +150,7 @@ export interface ICourseSection {
 }
 
 export interface ICourseContent {
+  id: number;
   type:
     | "pdf"
     | "video"
@@ -169,6 +172,7 @@ export interface ICourseContent {
   pollData?: PollQuestion;
   placeholder?: string;
   description?: string;
+  is_completed?: boolean;
 }
 
 export interface PollOption {
