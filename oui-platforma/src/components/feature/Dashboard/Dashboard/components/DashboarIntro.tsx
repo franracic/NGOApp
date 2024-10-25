@@ -15,15 +15,15 @@ import {
 } from "@chakra-ui/react";
 import { MdEvent, MdLibraryBooks, MdPeople, MdSchool } from "react-icons/md";
 
-interface DashboarIntroProps {
+interface DashboardIntroProps {
   user?: IUser;
   loading: boolean;
 }
 
-export const DashboarIntro = ({
+export const DashboardIntro = ({
   user = mockUsers[0],
   loading,
-}: DashboarIntroProps) => {
+}: DashboardIntroProps) => {
   const textColor = "gray.800";
   const cardBg = "white";
   const textSecondary = "gray.400";
@@ -95,7 +95,6 @@ export const DashboarIntro = ({
           </Skeleton>
         </Box>
 
-        {/* Active Courses Card */}
         <Box w="full">
           <Skeleton isLoaded={!loading} borderRadius="2xl">
             <Box
@@ -108,7 +107,7 @@ export const DashboarIntro = ({
               rounded="2xl"
             >
               <Text fontSize="20px" fontWeight="bold" color={textColor}>
-                {user.completedCourses?.length || "No courses"}
+                {user.completed_courses_count || "No courses"}
               </Text>
               <Text
                 fontSize="smaller"
@@ -133,7 +132,6 @@ export const DashboarIntro = ({
           </Skeleton>
         </Box>
 
-        {/* Connected Peers Card */}
         <Box w="full" display={{ base: "none", md: "block" }}>
           <Skeleton isLoaded={!loading} borderRadius="2xl">
             <Box
@@ -171,7 +169,6 @@ export const DashboarIntro = ({
           </Skeleton>
         </Box>
 
-        {/* Recommended Resources Card */}
         <Box w="full">
           <Skeleton isLoaded={!loading} borderRadius="2xl">
             <Box
@@ -209,7 +206,6 @@ export const DashboarIntro = ({
           </Skeleton>
         </Box>
 
-        {/* Mentees Card */}
         {user.isMentor && user.mentees && user.mentees.length > 0 && (
           <Box w="full">
             <Skeleton isLoaded={!loading} borderRadius="2xl">
@@ -249,7 +245,6 @@ export const DashboarIntro = ({
           </Box>
         )}
 
-        {/* Upcoming Events Card */}
         <Box w="full">
           <Skeleton isLoaded={!loading} borderRadius="2xl">
             <Box

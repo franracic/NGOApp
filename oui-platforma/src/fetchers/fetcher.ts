@@ -14,11 +14,17 @@ export async function fetcher<T>(
       uid: authHeader.uid || "",
       Authorization: "Bearer " + authHeader.access || "",
     };
-    console.log(headers, input, init);
+    console.log({
+      ...init,
+      headers,
+    });
+    // await new Promise((resolve) => setTimeout(resolve, 10000));
     const response = await fetch(input, {
       ...init,
       headers,
     });
+
+    console.log(response);
 
     if (!response.ok) {
       throw new Error(`Response status: ${response.status}`);

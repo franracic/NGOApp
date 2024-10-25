@@ -1,7 +1,10 @@
 import { ICourseContent } from "@/typings/course";
-import { Heading } from "@chakra-ui/react";
+import { Alert, AlertIcon, Box, Button } from "@chakra-ui/react";
 import React from "react";
+import { AudioPlayer } from "./components/AudioPlayer";
 import { FormComponent } from "./components/FormComponent";
+import { ImageComponent } from "./components/ImageComponent";
+import { MarkdownTextComponent } from "./components/MarkdownTextComponent";
 import { PdfViewer } from "./components/PdfViewer";
 import { PollComponent } from "./components/PollComponent";
 import { QuizComponent } from "./components/QuizComponent";
@@ -9,71 +12,54 @@ import { SurveyComponent } from "./components/SurveyComponent";
 import { UploadComponent } from "./components/UploadComponent";
 import { VideoPlayer } from "./components/VideoPlayer";
 
+const componentMap: Record<ICourseContent["type"], React.FC<any>> = {
+  pdf: PdfViewer,
+  video: VideoPlayer,
+  audio: AudioPlayer,
+  image: ImageComponent,
+  text: MarkdownTextComponent,
+  quiz: QuizComponent,
+  form: FormComponent,
+  poll: PollComponent,
+  survey: SurveyComponent,
+  upload: UploadComponent,
+};
+
 interface ContentRendererProps {
   content: ICourseContent;
-  onContentComplete: (contentTitle: string) => void;
+  onContentComplete: (title: string) => void;
 }
 
 export const ContentRenderer: React.FC<ContentRendererProps> = ({
   content,
   onContentComplete,
 }) => {
-  switch (content.type) {
-    case "video":
-      return (
-        <VideoPlayer
-          url={content.url!}
-          onEnded={() => onContentComplete(content.title)}
-        />
-      );
-    case "pdf":
-      return (
-        <PdfViewer
-          title={content.title}
-          url={content.url!}
-          onComplete={() => onContentComplete(content.title)}
-        />
-      );
-    case "quiz":
-      return (
-        <QuizComponent
-          quizData={content.quizData!}
-          onComplete={() => onContentComplete(content.title)}
-        />
-      );
-    case "form":
-      return (
-        <FormComponent
-          formFields={content.formFields!}
-          onComplete={() => onContentComplete(content.title)}
-        />
-      );
-    case "upload":
-      return (
-        <UploadComponent onComplete={() => onContentComplete(content.title)} />
-      );
-    case "survey":
-      return (
-        <SurveyComponent
-          questions={[]}
-          onComplete={() => onContentComplete(content.title)}
-        />
-      );
-    case "poll":
-      return (
-        <PollComponent
-          pollData={content.pollData!}
-          onComplete={() => onContentComplete(content.title)}
-        />
-      );
-    case "youtube":
-      return (
-        <VideoPlayer
-          url={content.url!}
-          onEnded={() => onContentComplete(content.title)}
-        />
-      );
-    default:
-      return <Heading as="h2">Content not supported</Heading>;
+  const Component = componentMap[content.type];
+  if (!Component) {
+    return (
+      <Box>
+        <Alert status="error">
+          <AlertIcon />
+          Unable to load content of type &quot;{content.type}&quot;. Please try
+          again later.
+        </Alert>
+        <Button
+          mt={4}
+          colorScheme="red"
+          onClick={() => onContentComplete(content.title)}
+        >
+          Mark as Complete
+        </Button>
+      </Box>
+    );
   }
+
+  return (
+    <Box>
+      <Component
+        {...content}
+        onComplete={() => onContentComplete(content.title)}
+      />
+    </Box>
+  );
 };

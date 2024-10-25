@@ -4,6 +4,7 @@ from simple_history.models import HistoricalRecords
 from django.core.validators import RegexValidator
 
 class User(AbstractUser):
+    BEGINNER = 'beginner'
     WORKER = 'worker'
     MENTOR = 'mentor'
     ADMIN = 'admin'
@@ -54,18 +55,28 @@ class User(AbstractUser):
     availabilityStatus = models.CharField(max_length=100, null=True, blank=True)
     activityLevel = models.IntegerField(default=0)
     experiencePoints = models.IntegerField(default=0)
-    level = models.IntegerField(default=0)
+    level = models.IntegerField(default=1)
     connectionsCount = models.IntegerField(null=True, blank=True)
     isMentor = models.BooleanField(default=False)
     expertise = models.JSONField(null=True, blank=True)
-    mentees = models.ManyToManyField('self', null=True, blank=True)
+    mentees = models.ManyToManyField('self', blank=True)
+    completed_courses_count = models.IntegerField(default=0)
+    submitted_resources_count = models.IntegerField(default=0)
+    connections_count = models.IntegerField(default=0)
+    login_streak = models.IntegerField(default=0)
+    comment_count = models.IntegerField(default=0)
+    perfect_quizzes_count = models.IntegerField(default=0)
+    liked_resources_count = models.IntegerField(default=0)
+    viewed_resources_count = models.IntegerField(default=0)
+    time_spent_learning = models.FloatField(default=0.0)
 
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=WORKER)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=BEGINNER)
 
     history = HistoricalRecords()
 
     class Meta:
         permissions = [
+            ("intro", "Can view intro"),
             ("can_view_worker_dashboard", "Can view worker dashboard"),
             ("can_view_mentor_dashboard", "Can view mentor dashboard"),
             ("can_view_admin_dashboard", "Can view admin dashboard"),

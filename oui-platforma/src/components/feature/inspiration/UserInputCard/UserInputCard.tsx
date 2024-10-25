@@ -3,13 +3,13 @@ import { Box, Heading, Text } from "@chakra-ui/react";
 interface UserInputCardProps {
   title?: string;
   content: string;
-  bgColor?: string;
+  bg_color?: string;
 }
 
 export const UserInputCard: React.FC<UserInputCardProps> = ({
   title,
   content,
-  bgColor = "white",
+  bg_color: bgColor = "white",
 }) => {
   return (
     <Box

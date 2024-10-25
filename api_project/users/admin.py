@@ -8,9 +8,10 @@ class UserAdmin(BaseUserAdmin):
         (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('name', 'email', 'avatar', 'bio', 'city', 'country', 'jobTitle')}),
         ('Interests and Social', {'fields': ('interests', 'website', 'linkedin', 'twitter', 'instagram')}),
-        ('Status', {'fields': ('isNetworking', 'availabilityStatus', 'activityLevel', 'experiencePoints', 'level', 'connectionsCount')}),
+        ('Status', {'fields': ('isNetworking', 'availabilityStatus', 'activityLevel', 'experiencePoints', 'level', 'connectionsCount', 'completed_courses_count', 'submitted_resources_count', 'time_spent_learning')}),
         ('Mentorship', {'fields': ('isMentor', 'expertise', 'mentees')}),
         ('Role and Permissions', {'fields': ('role', 'is_staff', 'is_active', 'groups', 'user_permissions')}),
+        ('Learning Statistics', {'fields': ('login_streak', 'comment_count', 'perfect_quizzes_count', 'liked_resources_count', 'viewed_resources_count')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     list_display = ('username', 'email', 'name', 'role', 'is_staff', 'is_active')

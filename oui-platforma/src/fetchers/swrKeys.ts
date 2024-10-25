@@ -17,6 +17,7 @@ export const swrKeys = {
   },
   resources: `${apiUrl}/networking/resources/`,
   resource: (id: number) => `${apiUrl}/networking/resources/${id}/`,
+  multipleResources: `${apiUrl}/networking/resources/get_multiple/`,
   lectures: `${apiUrl}/courses/lectures/`,
   workshops: `${apiUrl}/courses/workshops/`,
   exams: `${apiUrl}/courses/exams/`,
@@ -25,4 +26,10 @@ export const swrKeys = {
   },
   completeContent: (id: number) =>
     `${apiUrl}/courses/course-contents/${id}/complete/`,
+  comments: `${apiUrl}/courses/comments/`,
+  multipleComments: `${apiUrl}/courses/comments/get_multiple/`,
+  comment: (id: number) => `${apiUrl}/courses/comments/${id}/`,
+  trophies: `${apiUrl}/networking/trophies/`,
+  userInputs: `${apiUrl}/networking/user-inputs/`,
+  trophyTemplates: `${apiUrl}/networking/trophy-templates/with_user_progress/`,
 };

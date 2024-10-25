@@ -26,7 +26,6 @@ const placeholderImage = "https://fakeimg.pl/600x400?text=No+image";
 
 interface ICourseCardProps extends Partial<ICourse> {
   link?: boolean;
-  onComplete?: () => void;
   loading?: boolean;
 }
 
@@ -36,14 +35,12 @@ export const CourseCard = ({
   cover_image,
   id,
   authors,
-  no_of_reviews,
+  no_of_ratings,
   total_duration,
   type,
   course = "STEM Youth Worker",
   is_unlocked,
   link = true,
-  onComplete,
-  sections,
   loading = false,
   progress = 0,
   is_completed,
@@ -59,12 +56,7 @@ export const CourseCard = ({
           {...(is_unlocked && link && !loading
             ? {
                 as: NextLink,
-                href:
-                  type === "Lecture"
-                    ? `/courses/${id}`
-                    : type === "Workshop"
-                    ? `/workshops/${id}`
-                    : `/exams/${id}`,
+                href: `/courses/${id}`,
               }
             : { href: undefined })}
           overflow="hidden"
@@ -160,7 +152,7 @@ export const CourseCard = ({
                 </Flex>
                 <RatingText
                   average_rating={average_rating}
-                  no_of_reviews={no_of_reviews}
+                  no_of_reviews={no_of_ratings}
                 />
                 <TotalDurationText total_duration={total_duration} />
                 <Badge

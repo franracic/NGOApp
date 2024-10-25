@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from users.serializers import BasicUserSerializer
-from .models import IResource, IChallenge, ITrophy, IDiscussion
+from .models import IResource, IDiscussion, Trophy, TrophyTemplate, UserInput
 
 class IResourceSerializer(serializers.ModelSerializer):
     createdBy = BasicUserSerializer(read_only=True)
@@ -11,14 +11,21 @@ class IResourceSerializer(serializers.ModelSerializer):
         model = IResource
         fields = '__all__'
 
-class IChallengeSerializer(serializers.ModelSerializer):
+class TrophyTemplateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = IChallenge
+        model = TrophyTemplate
         fields = '__all__'
 
-class ITrophySerializer(serializers.ModelSerializer):
+class UserTrophySerializer(serializers.ModelSerializer):
+    trophy_template = TrophyTemplateSerializer()
+
     class Meta:
-        model = ITrophy
+        model = Trophy
+        fields = ['id', 'trophy_template', 'progress', 'is_earned']
+
+class UserInputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserInput
         fields = '__all__'
 
 class IDiscussionSerializer(serializers.ModelSerializer):

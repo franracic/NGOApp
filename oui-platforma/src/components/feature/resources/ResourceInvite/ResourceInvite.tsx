@@ -55,7 +55,6 @@ export const ResourceInvite = ({ currentUser }: { currentUser: IUser }) => {
     isOfficial: false,
   });
 
-  // Handle input changes
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -173,44 +172,56 @@ export const ResourceInvite = ({ currentUser }: { currentUser: IUser }) => {
               borderColor: "yellowDark",
             }}
             onClick={onOpen}
+            isDisabled={
+              currentUser.role == "worker" || currentUser.role == "beginner"
+            }
           >
-            TRY SHARING
+            {currentUser.role == "worker" || currentUser.role == "beginner"
+              ? "LOCKED"
+              : "TRY SHARING"}
           </Button>
+          {(currentUser.role == "worker" || currentUser.role == "beginner") && (
+            <Text color={"red"} opacity={"40%"}>
+              Progress further to share resources
+            </Text>
+          )}
         </Stack>
       </Box>
 
-      <Box bg="yellowDark" py={10} px={5}>
-        <Flex
-          alignItems="center"
-          maxW="1200px"
-          mx="auto"
-          direction={["column", "row"]}
-        >
-          <Box>
-            <Heading as="h2" size="2xl" color="white">
-              Let’s share knowledge
-            </Heading>
-            <Text fontSize="xl" color="white" mt={2}>
-              We would love to see your resources shared with the community.
-            </Text>
-          </Box>
-          <Spacer />
-          <Button
-            variant="outline"
-            colorScheme="whiteAlpha"
-            size="lg"
-            borderWidth="2px"
-            borderColor="white"
-            color="yellowDark"
-            bg="white"
-            _hover={{ bg: "transparent", color: "white" }}
-            onClick={onOpen}
-            mt={[4, 0]}
+      {(currentUser.role == "worker" || currentUser.role == "beginner") && (
+        <Box bg="yellowDark" py={10} px={5}>
+          <Flex
+            alignItems="center"
+            maxW="1200px"
+            mx="auto"
+            direction={["column", "row"]}
           >
-            SHARE YOUR RESOURCE
-          </Button>
-        </Flex>
-      </Box>
+            <Box>
+              <Heading as="h2" size="2xl" color="white">
+                Let’s share knowledge
+              </Heading>
+              <Text fontSize="xl" color="white" mt={2}>
+                We would love to see your resources shared with the community.
+              </Text>
+            </Box>
+            <Spacer />
+            <Button
+              variant="outline"
+              colorScheme="whiteAlpha"
+              size="lg"
+              borderWidth="2px"
+              borderColor="white"
+              color="yellowDark"
+              bg="white"
+              _hover={{ bg: "transparent", color: "white" }}
+              onClick={onOpen}
+              mt={[4, 0]}
+            >
+              SHARE YOUR RESOURCE
+            </Button>
+          </Flex>
+        </Box>
+      )}
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />

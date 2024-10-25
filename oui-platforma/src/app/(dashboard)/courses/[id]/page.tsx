@@ -23,6 +23,5 @@ export default function Course() {
     return <div>Loading...</div>;
   }
 
-  console.log(course);
   return <CoursePage course={course} courseError={courseError} />;
 }

@@ -15,8 +15,6 @@ export const WorkshopSection = () => {
     swrKeys.exams,
     fetcher<ICourse[]>
   );
-  console.log(swrKeys.workshops, swrKeys.exams);
-
   if (workshopsError || examsError) return <div>Failed to load lectures.</div>;
   if (!workshops && !exams) return <div>Loading lectures...</div>;
   const inProgressLectures = [
@@ -57,7 +55,7 @@ export const WorkshopSection = () => {
           </Heading>
           <SimpleGrid columns={[1, 2, 3, 4]} spacing={6}>
             {completedLectures.map((course) => (
-              <CourseCard key={course.id} {...course} link={false} />
+              <CourseCard key={course.id} {...course} link={true} />
             ))}
           </SimpleGrid>
         </Box>

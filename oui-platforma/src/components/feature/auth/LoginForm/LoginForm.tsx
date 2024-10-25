@@ -86,7 +86,6 @@ export const LoginForm = () => {
     try {
       const response = await trigger(data);
       if (response) {
-        console.log(response);
         localStorage.setItem(
           "auth-header",
           JSON.stringify({

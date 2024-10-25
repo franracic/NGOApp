@@ -50,7 +50,7 @@ export const RegisterContextProvider = ({
       country: "",
       workPlace: "",
       employer: "",
-      role: "worker",
+      role: "beginner",
     },
   });
 

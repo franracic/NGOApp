@@ -15,7 +15,7 @@ import {
 import useSWR from "swr";
 import { CourseList } from "../../courses/CourseList/CourseList";
 import { AchievementsNearCompletion } from "./components/AchievementsNearCompletion";
-import { DashboarIntro } from "./components/DashboarIntro";
+import { DashboardIntro } from "./components/DashboarIntro";
 import { RecommendedActivity } from "./components/RecommendedActivity";
 
 export const Dashboard = () => {
@@ -43,10 +43,14 @@ export const Dashboard = () => {
     );
   }
 
+  const unCompletedCourses =
+    courses?.sort((a, b) => Number(a.is_completed) - Number(b.is_completed)) ||
+    [];
+
   return (
     <Box position="relative" w="full">
       <Flex direction="column" px={{ base: 2, md: 4 }} py={{ base: 2, md: 4 }}>
-        <DashboarIntro user={user} loading={isUserLoading} />
+        <DashboardIntro user={user} loading={isUserLoading} />
         {coursesError && (
           <Alert status="error" mt={4}>
             <AlertIcon />
@@ -59,7 +63,7 @@ export const Dashboard = () => {
         <Flex direction={{ base: "column", lg: "row" }} gap={6} w="full">
           <Box w={{ base: "100%", lg: "70%" }}>
             <CourseList
-              courses={courses}
+              courses={unCompletedCourses}
               loading={isCoursesLoading}
               maxCourses={3}
             />

@@ -60,7 +60,7 @@ const steps = [
       description: "work place",
       type: "text",
     },
-    { title: "NDO", icon: MdGroup, description: "NDO", type: "text" },
+    { title: "NGO", icon: MdGroup, description: "NGO", type: "text" },
     {
       title: "School",
       icon: MdSchool,

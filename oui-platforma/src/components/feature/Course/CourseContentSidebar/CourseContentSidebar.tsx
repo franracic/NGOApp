@@ -62,11 +62,14 @@ export const CourseContentSidebar: React.FC<CourseContentSidebarProps> = ({
                 _hover={{ bg: "gray.200" }}
               >
                 <Text flex="1">{content.title}</Text>
-                {content.duration && (
-                  <Text fontSize="sm" color="gray.500" flexShrink={0}>
-                    {content.duration}
-                  </Text>
-                )}
+                {(content.type === "pdf" ||
+                  content.type === "video" ||
+                  content.type === "audio") &&
+                  content.duration && (
+                    <Text fontSize="sm" color="gray.500" flexShrink={0}>
+                      {content.duration}
+                    </Text>
+                  )}
                 {content.is_completed ? (
                   <FaCheckCircle color="green.500" />
                 ) : null}

@@ -42,20 +42,47 @@ class IResource(models.Model):
     def __str__(self):
         return self.title
 
+class TrophyTemplate(models.Model):
+    DIFFICULTY_CHOICES = [
+        ('very easy', 'Very Easy'),
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+        ('very hard', 'Very Hard'),
+        ('extremely hard', 'Extremely Hard'),
+    ]
 
-class IChallenge(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
-    status = models.CharField(max_length=100)
-    level = models.IntegerField()
-    progress = models.IntegerField()
+    icon = models.CharField(max_length=100)
+    trophy_type = models.CharField(max_length=50)
+    target_value = models.IntegerField(default=0)
+    difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='easy')
 
-class ITrophy(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    icon = models.TextField()
-    progress = models.IntegerField()
-    isEarned = models.BooleanField(default=False)
+    def __str__(self):
+        return self.title
+
+class Trophy(models.Model):
+    user = models.ForeignKey(User, related_name='trophies', on_delete=models.CASCADE)
+    trophy_template = models.ForeignKey(TrophyTemplate, on_delete=models.CASCADE, related_name='user_trophies')
+    progress = models.IntegerField(default=0)
+    is_earned = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('user', 'trophy_template')
+
+    def __str__(self):
+        return f"{self.trophy_template.title} - {self.user.username}"
+
+class UserInput(models.Model):
+    user = models.ForeignKey(User, related_name='user_inputs', on_delete=models.CASCADE, default=7, blank=True)
+    title = models.CharField(max_length=200, null=True, blank=True)
+    content = models.TextField()
+    bg_color = models.CharField(max_length=50, default='white')
+
+    def __str__(self):
+        return f"UserInput by {self.user.username}"
+
 
 class IDiscussion(models.Model):
     title = models.CharField(max_length=100)

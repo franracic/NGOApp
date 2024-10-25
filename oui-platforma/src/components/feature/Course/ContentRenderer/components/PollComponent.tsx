@@ -14,12 +14,12 @@ import {
 import React, { useState } from "react";
 
 interface PollComponentProps {
-  pollData: PollQuestion;
+  poll_questions: PollQuestion;
   onComplete: () => void;
 }
 
 export const PollComponent: React.FC<PollComponentProps> = ({
-  pollData,
+  poll_questions: pollData,
   onComplete,
 }) => {
   const [poll, setPoll] = useState<PollQuestion>(pollData);

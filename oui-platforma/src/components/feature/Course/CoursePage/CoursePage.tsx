@@ -1,8 +1,7 @@
-// CoursePage.tsx
 import { completeContent, completeCourse } from "@/fetchers/courses";
 import { swrKeys } from "@/fetchers/swrKeys";
 import { ICourse, ICourseContent } from "@/typings/course";
-import { Box, Card, Flex } from "@chakra-ui/react";
+import { Box, Button, Card, Flex } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { mutate } from "swr";
 import useSWRMutation from "swr/mutation";
@@ -25,13 +24,17 @@ export const CoursePage: React.FC<CoursePageProps> = ({
   );
   const [activeTab, setActiveTab] = useState<number>(0);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [isContentCompleted, setIsContentCompleted] = useState<boolean>(false);
 
   useEffect(() => {
     if (course && course.sections) {
       const firstIncompleteContent = course.sections
         .flatMap((section) => section.contents)
         .find((content) => !content.is_completed);
-      setSelectedContent(firstIncompleteContent || null);
+      setSelectedContent(
+        firstIncompleteContent || course.sections[0].contents[0] || null
+      );
+      setIsContentCompleted(false);
     }
   }, [course]);
 
@@ -45,6 +48,7 @@ export const CoursePage: React.FC<CoursePageProps> = ({
     {
       onSuccess: () => {
         mutate(swrKeys.courses);
+        setIsContentCompleted(true);
       },
       onError: (error) => {
         console.error("Error marking content as completed:", error);
@@ -70,13 +74,21 @@ export const CoursePage: React.FC<CoursePageProps> = ({
     }
   );
 
+  const isAllContentCompleted = () => {
+    if (course && course.sections) {
+      const allContents = course.sections.flatMap(
+        (section) => section.contents
+      );
+      return allContents.every((content) => content.is_completed);
+    }
+    return false;
+  };
+
   const handleContentCompletion = () => {
     triggerCompleteContent();
-    setIsFeedbackOpen(true);
   };
 
   const handleNextContent = () => {
-    setIsFeedbackOpen(false);
     if (course && selectedContent) {
       const allContents = course.sections.flatMap(
         (section) => section.contents
@@ -85,10 +97,24 @@ export const CoursePage: React.FC<CoursePageProps> = ({
         (content) => content.id === selectedContent?.id
       );
       const nextContent = allContents[currentIndex + 1];
-      if (nextContent) {
+
+      if (nextContent && !nextContent.is_completed) {
         setSelectedContent(nextContent);
+        setIsContentCompleted(false);
       } else {
+        if (!isAllContentCompleted()) {
+          const firstIncompleteContent = course.sections
+            .flatMap((section) => section.contents)
+            .find((content) => !content.is_completed);
+          setSelectedContent(
+            firstIncompleteContent || course.sections[0].contents[0] || null
+          );
+          setIsContentCompleted(false);
+        }
+      }
+      if (isAllContentCompleted()) {
         triggerCompleteCourse();
+        setIsFeedbackOpen(true);
       }
     }
   };
@@ -106,6 +132,11 @@ export const CoursePage: React.FC<CoursePageProps> = ({
               content={selectedContent}
               onContentComplete={handleContentCompletion}
             />
+            {isContentCompleted && (
+              <Button mt={4} onClick={handleNextContent}>
+                Next
+              </Button>
+            )}
           </Card>
           <TabbedMenu
             course={course}
@@ -121,8 +152,8 @@ export const CoursePage: React.FC<CoursePageProps> = ({
       </Flex>
       <FeedbackModal
         isOpen={isFeedbackOpen}
+        courseId={course.id}
         onClose={() => setIsFeedbackOpen(false)}
-        onNext={handleNextContent}
       />
     </Flex>
   );

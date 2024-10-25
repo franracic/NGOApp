@@ -71,7 +71,6 @@ export const RegisterLastStep = () => {
       });
       router.push("/login");
     } catch (err) {
-      console.log(data);
       toast({
         title: "Registration failed.",
         description: "There was an issue creating your account.",

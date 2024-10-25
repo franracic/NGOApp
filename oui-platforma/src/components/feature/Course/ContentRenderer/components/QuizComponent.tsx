@@ -13,12 +13,12 @@ import {
 import React, { useState } from "react";
 
 interface QuizComponentProps {
-  quizData: IQuizQuestion[];
+  quiz_questions: IQuizQuestion[];
   onComplete: () => void;
 }
 
 export const QuizComponent: React.FC<QuizComponentProps> = ({
-  quizData,
+  quiz_questions: quizData,
   onComplete,
 }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -28,7 +28,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({
   const [score, setScore] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isPassed, setIsPassed] = useState(false);
-  if (!quizData) {
+  if (!quizData || quizData.length === 0) {
     return (
       <Alert status="warning" variant="solid" mt={6}>
         <AlertIcon />
@@ -36,7 +36,6 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({
       </Alert>
     );
   }
-
   const currentQuestion = quizData[currentQuestionIndex];
 
   const handleOptionChange = (value: string) => {
@@ -44,7 +43,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({
   };
 
   const handleNextQuestion = () => {
-    if (selectedOption === currentQuestion.correctAnswer) {
+    if (selectedOption === currentQuestion.correct_answer) {
       setScore(score + 1);
     }
     setSelectedOption(undefined);
@@ -52,7 +51,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
       const finalScore =
-        score + (selectedOption === currentQuestion.correctAnswer ? 1 : 0);
+        score + (selectedOption === currentQuestion.correct_answer ? 1 : 0);
       setIsPassed(finalScore / quizData.length >= 0.6);
       setIsCompleted(true);
       if (finalScore / quizData.length >= 0.6) {

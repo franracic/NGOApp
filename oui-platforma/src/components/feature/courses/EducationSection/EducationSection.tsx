@@ -15,8 +15,6 @@ export const EducationSection = () => {
   if (!lectures) return <div>Loading lectures...</div>;
   if (lecturesError) return <div>Failed to load lectures.</div>;
 
-  console.log(lectures);
-
   const inProgressLectures = lectures.filter((course) => !course.is_completed);
   const completedLectures = lectures.filter((course) => course.is_completed);
 
@@ -49,7 +47,7 @@ export const EducationSection = () => {
           </Heading>
           <SimpleGrid columns={[1, 2, 3, 4]} spacing={6}>
             {completedLectures.map((course) => (
-              <CourseCard key={course.id} {...course} link={false} />
+              <CourseCard key={course.id} {...course} link={true} />
             ))}
           </SimpleGrid>
         </Box>

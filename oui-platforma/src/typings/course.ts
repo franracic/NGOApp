@@ -4,7 +4,7 @@ export interface ICourse {
   average_rating?: number;
   description?: string;
   id: number;
-  no_of_reviews?: number;
+  no_of_ratings?: number;
   authors?: IAuthor[];
   total_duration?: string;
   is_unlocked?: boolean;
@@ -15,6 +15,8 @@ export interface ICourse {
   completed?: number;
   contentCount?: number;
   progress?: number;
+  resources?: number[];
+  comments?: number[];
 }
 
 export interface Video {
@@ -82,24 +84,27 @@ export interface IUser {
   groups?: IGroup[];
   trophies?: ITrophy[];
   likedResources?: number[];
-  completedCourses?: number[];
+  completed_courses_count?: number[];
 }
 
-export interface IChallenge {
-  id: number;
-  title: string;
-  description: string;
-  status: string;
-  level: number;
-  progress: number;
-}
 export interface ITrophy {
   id: number;
   title: string;
   description: string;
-  icon: any;
+  icon: string;
+  trophy_type: string;
+  target_value: number;
+  difficulty: string;
   progress: number;
-  isEarned: boolean;
+  is_earned: boolean;
+}
+
+export interface IUserInput {
+  id: number;
+  user: number;
+  title?: string;
+  content: string;
+  bg_color?: string;
 }
 
 export interface IActivity {
@@ -137,11 +142,14 @@ export interface IEvent {
   level: number;
 }
 
-export interface IQuizQuestion {
-  type: "multiple-choice" | "true-false";
-  question: string;
-  options: string[];
-  correctAnswer: string;
+export interface IComment {
+  id: number;
+  content: string;
+  user: IUser;
+  timestamp: string;
+  replies: IComment[];
+  likes_count: number;
+  is_liked: boolean;
 }
 
 export interface ICourseSection {
@@ -149,31 +157,24 @@ export interface ICourseSection {
   contents: ICourseContent[];
 }
 
-export interface ICourseContent {
-  id: number;
-  type:
-    | "pdf"
-    | "video"
-    | "quiz"
-    | "form"
-    | "upload"
-    | "survey"
-    | "youtube"
-    | "poll"
-    | "image"
-    | "text"
-    | "audio";
-  title: string;
-  url?: string;
-  duration?: string;
-  transcript?: string;
-  quizData?: IQuizQuestion[];
-  formFields?: IFormField[];
-  pollData?: PollQuestion;
-  placeholder?: string;
-  description?: string;
-  is_completed?: boolean;
+export interface IQuizQuestion {
+  type: "multiple-choice" | "true-false";
+  question: string;
+  options: string[];
+  correct_answer: string;
 }
+
+export type ICourseContent =
+  | IPdfContent
+  | IVideoContent
+  | IAudioContent
+  | IImageContent
+  | ITextContent
+  | IQuizContent
+  | IFormContent
+  | IPollContent
+  | ISurveyContent
+  | IUploadContent;
 
 export interface PollOption {
   label: string;
@@ -190,4 +191,88 @@ export interface IFormField {
   type: string;
   options?: string[];
   accept?: string;
+}
+
+export interface IPdfContent extends ICourseContentBase {
+  type: "pdf";
+  url: string;
+  duration?: string;
+}
+
+export interface ICourseContentBase {
+  id: number;
+  type:
+    | "pdf"
+    | "video"
+    | "quiz"
+    | "form"
+    | "upload"
+    | "survey"
+    | "poll"
+    | "image"
+    | "text"
+    | "audio";
+  title: string;
+  description?: string;
+  is_completed?: boolean;
+}
+
+export interface IVideoContent extends ICourseContentBase {
+  type: "video";
+  url: string;
+  duration?: string;
+}
+export interface IAudioContent extends ICourseContentBase {
+  type: "audio";
+  url: string;
+  duration?: string;
+  transcript?: string;
+}
+
+export interface IImageContent extends ICourseContentBase {
+  type: "image";
+  src: string;
+  alt: string;
+  width?: string;
+  height?: string;
+}
+
+export interface ITextContent extends ICourseContentBase {
+  type: "text";
+  content: string;
+  completeAfterSeconds?: number;
+}
+
+export interface IQuizContent extends ICourseContentBase {
+  type: "quiz";
+  quizData: IQuizQuestion[];
+}
+
+export interface IFormContent extends ICourseContentBase {
+  type: "form";
+  formFields: IFormField[];
+}
+
+export interface IPollContent extends ICourseContentBase {
+  type: "poll";
+  pollData: PollQuestion;
+}
+export interface SurveyQuestion {
+  id: number;
+  question: string;
+  type: "multiple-choice" | "text" | "rating";
+  options?: string[];
+  ratingScale?: number;
+  placeholder?: string;
+}
+
+export interface ISurveyContent extends ICourseContentBase {
+  type: "survey";
+  survey_questions: SurveyQuestion[];
+}
+
+export interface IUploadContent extends ICourseContentBase {
+  type: "upload";
+  acceptedFileTypes?: string[];
+  multiple?: boolean;
 }

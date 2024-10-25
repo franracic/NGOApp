@@ -142,7 +142,6 @@ export const ResourceItem = ({
         return <Icon as={FaLink} color="yellowDark" boxSize={6} />;
     }
   };
-  console.log(createdBy.avatar);
   return (
     <Card mb={8} p={4}>
       <VStack spacing={4} alignItems="flex-start" width="100%">

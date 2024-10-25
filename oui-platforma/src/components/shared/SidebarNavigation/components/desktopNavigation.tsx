@@ -13,6 +13,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 import {
   MdAccountCircle,
   MdExitToApp,
@@ -23,6 +24,16 @@ import { mutate } from "swr";
 import { NavigationMenu } from "./NavigationMenu";
 
 export const DesktopNavigation = ({ isOpen }: { isOpen: boolean }) => {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    router.push("/login");
+    localStorage.removeItem("auth-header");
+    mutate(swrKeys.currentUser, null, {
+      revalidate: false,
+    });
+  };
+
   return (
     <VStack
       flexGrow={1}
@@ -41,15 +52,7 @@ export const DesktopNavigation = ({ isOpen }: { isOpen: boolean }) => {
               <MdAccountCircle />
               <Text ml={2}>My Account</Text>
             </MenuItem>
-            <MenuItem
-              onClick={() => {
-                localStorage.removeItem("auth-header");
-                mutate(swrKeys.currentUser, null, {
-                  revalidate: false,
-                });
-              }}
-              color="red"
-            >
+            <MenuItem onClick={handleLogout} color="red">
               <MdExitToApp />
               <Text ml={2}>Logout</Text>
             </MenuItem>

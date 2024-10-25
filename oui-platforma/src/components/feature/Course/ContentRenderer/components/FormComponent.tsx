@@ -19,12 +19,12 @@ import {
 import React, { useState } from "react";
 
 interface FormComponentProps {
-  formFields: IFormField[];
+  form_fields: IFormField[];
   onComplete: () => void;
 }
 
 export const FormComponent: React.FC<FormComponentProps> = ({
-  formFields,
+  form_fields: formFields,
   onComplete,
 }) => {
   const [formValues, setFormValues] = useState<any>({});

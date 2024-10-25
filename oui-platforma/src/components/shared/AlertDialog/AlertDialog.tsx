@@ -18,6 +18,8 @@ interface AlertDialogComponentProps {
   alertTitle: string;
   alertBody: string;
   onConfirm: () => void;
+  scheme?: string;
+  size?: string;
 }
 
 export function AlertDialogComponent({
@@ -26,6 +28,8 @@ export function AlertDialogComponent({
   alertTitle,
   alertBody,
   onConfirm,
+  scheme,
+  size,
 }: AlertDialogComponentProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef<HTMLButtonElement>(null);
@@ -43,6 +47,8 @@ export function AlertDialogComponent({
         <IconButton
           aria-label="Open alert dialog"
           onClick={onOpen}
+          colorScheme={scheme}
+          size={size}
           icon={buttonIcon as React.ReactElement}
         />
       )}

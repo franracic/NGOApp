@@ -1,4 +1,6 @@
+import { ITrophy } from "@/typings/course";
 import {
+  Badge,
   Box,
   CircularProgress,
   CircularProgressLabel,
@@ -8,24 +10,32 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import React from "react";
+import { IconType } from "react-icons";
 
-interface TrophyCardProps {
-  title: string;
-  description: string;
-  icon: any;
-  progress: number;
-  isEarned: boolean;
-}
-
-export const TrophyCard: React.FC<TrophyCardProps> = ({
+export const TrophyCard: React.FC<ITrophy> = ({
   title,
   description,
   icon,
   progress,
-  isEarned,
+  is_earned,
+  difficulty,
 }) => {
   const bgColor = useColorModeValue("white", "gray.700");
   const textColor = useColorModeValue("gray.800", "white");
+
+  const difficultyColor =
+    {
+      "very easy": "green",
+      easy: "teal",
+      medium: "yellow",
+      hard: "orange",
+      "very hard": "red",
+      "extremely hard": "purple",
+    }[difficulty] || "gray";
+
+  const IconComponent = require("react-icons/fa")[
+    icon as keyof typeof import("react-icons/fa")
+  ] as IconType;
 
   return (
     <Box
@@ -34,14 +44,17 @@ export const TrophyCard: React.FC<TrophyCardProps> = ({
       borderRadius="lg"
       boxShadow="md"
       transition="all 0.3s"
-      _hover={{ transform: isEarned ? "none" : "scale(1.05)", boxShadow: "xl" }}
-      opacity={isEarned ? 1 : 0.8}
+      _hover={{
+        transform: is_earned ? "none" : "scale(1.05)",
+        boxShadow: "xl",
+      }}
+      opacity={is_earned ? 1 : 0.8}
     >
       <VStack align="center" spacing={4}>
         <Box position="relative" display="inline-block">
           <CircularProgress
             value={progress}
-            color={isEarned ? "green.400" : "yellow.400"}
+            color={is_earned ? "green.400" : "yellow.400"}
             size="40%"
             thickness="8px"
             display={"flex"}
@@ -49,9 +62,9 @@ export const TrophyCard: React.FC<TrophyCardProps> = ({
           >
             <CircularProgressLabel>
               <Icon
-                as={icon}
+                as={IconComponent}
                 boxSize={10}
-                color={isEarned ? "green.400" : "yellow.500"}
+                color={is_earned ? "green.400" : "yellow.500"}
               />
             </CircularProgressLabel>
           </CircularProgress>
@@ -62,7 +75,10 @@ export const TrophyCard: React.FC<TrophyCardProps> = ({
         <Text fontSize="sm" color="gray.500" textAlign="center">
           {description}
         </Text>
-        {!isEarned && (
+        <Badge colorScheme={difficultyColor} fontSize="sm">
+          {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+        </Badge>
+        {!is_earned && (
           <Text fontSize="xs" color="gray.500">
             {progress}% completed
           </Text>

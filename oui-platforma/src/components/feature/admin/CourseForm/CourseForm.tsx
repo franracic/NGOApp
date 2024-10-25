@@ -46,7 +46,7 @@ export const CourseForm = ({ courseId }: { courseId?: string }) => {
     course: "",
     completed: 0,
     contentCount: 0,
-    no_of_reviews: 0,
+    no_of_ratings: 0,
   });
 
   const [sections, setSections] = useState<ICourseSection[]>([]);
@@ -356,7 +356,7 @@ export const CourseForm = ({ courseId }: { courseId?: string }) => {
           cover_image={formData.cover_image}
           id={formData.id}
           authors={authors}
-          no_of_reviews={formData.no_of_reviews}
+          no_of_ratings={formData.no_of_ratings}
           total_duration={
             formData.total_duration != "" ? formData.total_duration : "1h 30m"
           }

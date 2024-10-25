@@ -1,5 +1,5 @@
 import { fetcher } from "@/fetchers/fetcher";
-import { ICourse } from "@/typings/course";
+import { ICourse, ITrophy } from "@/typings/course";
 import { swrKeys } from "./swrKeys";
 
 export function getCourses(showId: string) {
@@ -45,5 +45,18 @@ export function completeCourse(courseId: number) {
 export function completeContent(contentId: number) {
   return fetcher(swrKeys.completeContent(contentId), {
     method: "POST",
+  });
+}
+
+export function addRating(courseId: number, rating: number) {
+  return fetcher<ICourse>(`${swrKeys.editCourse(courseId)}rate/`, {
+    method: "POST",
+    body: JSON.stringify({ rating }),
+  });
+}
+
+export function getAllTrophiesWithProgress() {
+  return fetcher<ITrophy[]>(`${swrKeys.trophyTemplates}with_user_progress/`, {
+    method: 'GET',
   });
 }
