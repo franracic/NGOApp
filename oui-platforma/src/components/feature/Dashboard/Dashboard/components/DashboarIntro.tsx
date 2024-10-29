@@ -1,6 +1,5 @@
 "use client";
 
-import { mockUsers } from "@/components/feature/network/PTPSection/PTPSection";
 import { IUser } from "@/typings/course";
 import {
   Box,
@@ -16,14 +15,11 @@ import {
 import { MdEvent, MdLibraryBooks, MdPeople, MdSchool } from "react-icons/md";
 
 interface DashboardIntroProps {
-  user?: IUser;
+  user: IUser;
   loading: boolean;
 }
 
-export const DashboardIntro = ({
-  user = mockUsers[0],
-  loading,
-}: DashboardIntroProps) => {
+export const DashboardIntro = ({ user, loading }: DashboardIntroProps) => {
   const textColor = "gray.800";
   const cardBg = "white";
   const textSecondary = "gray.400";

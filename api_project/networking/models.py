@@ -89,3 +89,41 @@ class IDiscussion(models.Model):
     author = models.CharField(max_length=100)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = (
+        ('message', 'Message'),
+        ('connection_request', 'Connection Request'),
+        ('event', 'Event'),
+        ('achievement', 'Achievement'),
+    )
+
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    related_object_id = models.PositiveIntegerField(null=True, blank=True)
+
+    RELATED_MENU_ITEMS = (
+        ('dashboard', 'Dashboard'),
+        ('materials', 'Materials'),
+        ('education', 'Education'),
+        ('workshops', 'Workshops'),
+        ('inspiration', 'Inspiration'),
+        ('peer_to_peer', 'Peer to Peer'),
+        ('mentorship', 'Mentorship'),
+        ('networking', 'Networking'),
+    )
+
+    related_menu_item = models.CharField(
+        max_length=50,
+        choices=RELATED_MENU_ITEMS,
+        null=True,
+        blank=True,
+        help_text="The menu item this notification is related to."
+    )
+
+    def __str__(self):
+        return f"{self.notification_type} to {self.recipient.username}"

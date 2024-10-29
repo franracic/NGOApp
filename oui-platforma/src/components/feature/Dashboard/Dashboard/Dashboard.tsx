@@ -43,6 +43,10 @@ export const Dashboard = () => {
     );
   }
 
+  if (!user) {
+    return null;
+  }
+
   const unCompletedCourses =
     courses?.sort((a, b) => Number(a.is_completed) - Number(b.is_completed)) ||
     [];
@@ -69,7 +73,7 @@ export const Dashboard = () => {
             />
           </Box>
           <Box w={{ base: "100%", lg: "30%" }}>
-            <VStack spacing={6} align="stretch" h={"full"}>
+            <VStack spacing={2} align="stretch" h={"full"}>
               <RecommendedActivity user={user} loading={isUserLoading} />
               <AchievementsNearCompletion user={user} loading={isUserLoading} />
             </VStack>

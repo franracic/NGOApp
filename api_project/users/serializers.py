@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from networking.models import Trophy
-from .models import User, IGroup, IActivity
+from .models import Connection, ConnectionRequest, Message, User, IGroup, IActivity
 
 from django.contrib.auth.hashers import make_password
 
@@ -9,9 +9,14 @@ class BasicUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'name', 'avatar', 'city', 'country', 'jobTitle', 'bio', 'role', 'completed_courses_count'
+            'id', 'username', 'name', 'avatar', 'city', 'country', 'jobTitle', 'bio', 'role',
+            'interests', 'isNetworking', 'website', 'linkedin', 'twitter', 'instagram',
+            'availabilityStatus', 'activityLevel', 'experiencePoints', 'level',
+            'connectionsCount', 'isMentor', 'expertise', 'completed_courses_count',
+            'submitted_resources_count', 'connections_count', 'login_streak', 'comment_count',
+            'perfect_quizzes_count', 'liked_resources_count', 'viewed_resources_count',
+            'time_spent_learning',
         ]
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -63,3 +68,25 @@ class IActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = IActivity
         fields = '__all__'
+
+class ConnectionRequestSerializer(serializers.ModelSerializer):
+    sender = BasicUserSerializer(read_only=True)
+
+    class Meta:
+        model = ConnectionRequest
+        fields = ['id', 'sender', 'status', 'sent_at']
+
+class ConnectionSerializer(serializers.ModelSerializer):
+    user = BasicUserSerializer(source='user2', read_only=True)
+
+    class Meta:
+        model = Connection
+        fields = ['user', 'connected_at']
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender = BasicUserSerializer(read_only=True)
+    recipient = BasicUserSerializer(read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ['id', 'sender', 'recipient', 'content', 'sent_at']

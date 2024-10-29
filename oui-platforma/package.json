@@ -14,7 +14,11 @@
     "@emotion/styled": "^11.13.0",
     "@faker-js/faker": "^8.4.1",
     "axios": "^1.7.5",
+    "dompurify": "^3.1.7",
+    "emoji-mart": "^5.6.0",
+    "emoji-picker-react": "^4.12.0",
     "framer-motion": "^11.3.21",
+    "lodash": "^4.17.21",
     "next": "^14.2.16",
     "react": "^18",
     "react-beautiful-dnd": "^13.1.1",
@@ -29,8 +33,10 @@
     "typeface-noto-sans": "^1.1.13"
   },
   "devDependencies": {
+    "@types/dompurify": "^3.0.5",
+    "@types/emoji-mart": "^3.0.14",
     "@types/node": "^20",
-    "@types/react": "^18",
+    "@types/react": "^18.3.12",
     "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dom": "^18",
     "eslint": "^8",

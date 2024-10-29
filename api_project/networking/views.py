@@ -1,10 +1,11 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import IResource, IDiscussion, TrophyTemplate
+from .models import IResource, IDiscussion, Notification, TrophyTemplate
 from .serializers import (
     IResourceSerializer,
     IDiscussionSerializer,
+    NotificationSerializer,
     TrophyTemplateSerializer,
     UserTrophySerializer,
 )
@@ -106,3 +107,24 @@ class TrophyTemplateViewSet(viewsets.ReadOnlyModelViewSet):
             trophy_data.append(trophy_info)
 
         return Response(trophy_data)
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(recipient=self.request.user).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(recipient=self.request.user)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def markRead(self, request, pk=None):
+        try:
+            notification = self.get_object()
+            notification.is_read = True
+            notification.save()
+
+            return Response({'status': 'Notification marked as read.'}, status=status.HTTP_200_OK)
+        except Notification.DoesNotExist:
+            return Response({'detail': 'Notification not found.'}, status=status.HTTP_404_NOT_FOUND)

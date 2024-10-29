@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, IGroup, IActivity
+from .models import User, IGroup, IActivity, Connection, ConnectionRequest, Message
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -33,3 +33,6 @@ class IActivityAdmin(admin.ModelAdmin):
     list_filter = ('action', 'timestamp', 'username')
     search_fields = ('username', 'action', 'target')
 
+admin.site.register(Connection)
+admin.site.register(ConnectionRequest)
+admin.site.register(Message)

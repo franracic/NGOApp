@@ -16,14 +16,14 @@ export const Hero = ({
   return (
     <Box
       position="relative"
-      bgImage={img_url}
+      bgImage={`url(${img_url})`}
       bgSize="cover"
+      bgPos="center"
       flexDirection="column"
-      height="300px"
+      height={{ base: "200px", md: "250px", lg: "250px" }}
       display="flex"
-      color="white"
       justifyContent="center"
-      bgPos={"center"}
+      color="white"
     >
       <Box
         position="absolute"
@@ -34,12 +34,24 @@ export const Hero = ({
         bg="rgba(0, 0, 0, 0.5)"
         pointerEvents="none"
       />
-      <Box p={10} position="relative" zIndex={2}>
-        <Heading fontSize="6xl">{headingText}</Heading>
-        <Heading fontSize="3xl" mt={4}>
+
+      <Box
+        p={{ base: 4, md: 8, lg: 10 }}
+        position="relative"
+        zIndex={2}
+        maxW="1200px"
+        mx="auto"
+        textAlign="center"
+      >
+        <Heading fontSize={{ base: "3xl", md: "4xl", lg: "6xl" }}>
+          {headingText}
+        </Heading>
+        <Heading fontSize={{ base: "xl", md: "2xl", lg: "3xl" }} mt={4}>
           {subheadingText}
         </Heading>
-        <Text fontSize="lg">{bodyText}</Text>
+        <Text fontSize={{ base: "md", md: "lg", lg: "xl" }} mt={2}>
+          {bodyText}
+        </Text>
       </Box>
     </Box>
   );

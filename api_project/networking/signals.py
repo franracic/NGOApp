@@ -5,12 +5,14 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta
+from django.db import models
 
 from courses.models import IComment as CourseComment
 from courses.models import UserCourseProgress, UserCourseContentProgress, ICourse, ICourseContent
-from networking import models
-from networking.models import Trophy, TrophyTemplate, IResource
+from networking.models import Notification, Trophy, TrophyTemplate, IResource
 from django.contrib.auth.signals import user_logged_in
+
+from users.models import ConnectionRequest, Message
 
 User = get_user_model()
 
@@ -191,9 +193,9 @@ def award_login_trophies(sender, user, request, **kwargs):
 def award_perfectionist_trophy(sender, instance, created, **kwargs):
     user = instance.user
     content = instance.content
-    if instance.is_completed and content.type == 'quiz' and instance.score == 100:
+    if instance.is_completed and content.type == 'quiz':
         user.perfect_quizzes_count = UserCourseContentProgress.objects.filter(
-            user=user, is_completed=True, content__type='quiz', score=100
+            user=user, is_completed=True, content__type='quiz'
         ).count()
         user.save()
 
@@ -280,4 +282,42 @@ def award_champion_trophy(sender, instance, created, **kwargs):
                 'progress': progress,
                 'is_earned': is_earned,
             }
+        )
+
+# New Message Notification
+@receiver(post_save, sender=Message)
+def create_message_notification(sender, instance, created, **kwargs):
+    if created:
+        Notification.objects.create(
+            recipient=instance.recipient,
+            sender=instance.sender,
+            notification_type='message',
+            message=f'You have a new message from {instance.sender.username}.',
+            related_object_id=instance.id,
+            related_menu_item='peer_to_peer',
+        )
+
+# New Connection Request Notification
+@receiver(post_save, sender=ConnectionRequest)
+def create_connection_request_notification(sender, instance, created, **kwargs):
+    if created and instance.status == 'pending':
+        Notification.objects.create(
+            recipient=instance.recipient,
+            sender=instance.sender,
+            notification_type='connection_request',
+            message=f'{instance.sender.username} sent you a connection request.',
+            related_object_id=instance.id,
+            related_menu_item='peer_to_peer',
+        )
+
+# Achievement Unlocked Notification
+@receiver(post_save, sender=Trophy)
+def create_achievement_notification(sender, instance, created, **kwargs):
+    if instance.is_earned:
+        Notification.objects.create(
+            recipient=instance.user,
+            notification_type='achievement',
+            message=f'Congratulations! You have unlocked the "{instance.trophy_template.title}" achievement.',
+            related_object_id=instance.id,
+            related_menu_item='inspiration',
         )

@@ -1,96 +1,128 @@
+// src/components/user/UserCard.tsx
+
 import { IUser } from "@/typings/course";
 import {
+  Badge,
   Box,
   Button,
   Card,
   CardBody,
   Flex,
   Heading,
-  HStack,
+  Icon,
   Image,
+  Stack,
   Tag,
   Text,
-  VStack,
 } from "@chakra-ui/react";
-import { MdInterests, MdLocationCity, MdMessage, MdWork } from "react-icons/md";
-
-const placeholderImage = "https://fakeimg.pl/600x400?text=No+show+image";
+import { MdInterests, MdLocationCity, MdWork } from "react-icons/md";
 
 export const UserCard = ({
   user,
   onMessageClick,
 }: {
   user: IUser;
-  onMessageClick: (string: string) => void;
+  onMessageClick?: (userId: number) => void;
 }) => {
+  const getRoleBadgeProps = (role: string) => {
+    switch (role.toLowerCase()) {
+      case "beginner":
+        return { colorScheme: "green" };
+      case "worker":
+        return { colorScheme: "blue" };
+      case "mentor":
+        return { colorScheme: "orange" };
+      case "practitioner":
+        return { colorScheme: "teal" };
+      case "admin":
+        return {
+          colorScheme: "purple",
+          variant: "solid",
+        };
+      default:
+        return { colorScheme: "gray" };
+    }
+  };
+
+  const roleBadgeProps = getRoleBadgeProps(user.role);
+
   return (
     <Card
-      h={"100%"}
+      h="fit-content"
       overflow="hidden"
-      flexGrow={1}
-      variant="light"
+      flexGrow={0}
+      variant="outline"
       minWidth={0}
-      data-testid="show-card"
+      data-testid="user-card"
+      height={"100%"}
     >
-      <Box position="relative" width="100%" flexGrow={1}>
+      <Box position="relative" width="100%">
         <Image
-          src={user.avatar || placeholderImage}
+          src={user.avatar || "https://placehold.co/400x600"}
           alt={user.username}
-          sizes="(max-width: 768px) 25vw"
-          h={"220px"}
-          w={"100%"}
-          p={2}
-          borderRadius={"24px"}
-          sx={{ objectFit: "cover" }}
+          h="220px"
+          w="100%"
+          objectFit="cover"
         />
       </Box>
-      <CardBody color="brand.800" flexGrow={0} alignSelf={"center"}>
-        <VStack align="start" spacing={2}>
-          <Heading size="md" noOfLines={1}>
-            {user.username}
-          </Heading>
+      <CardBody p={4}>
+        <Stack spacing={3} justifyContent={"space-between"}>
+          <Flex justifyContent="space-between" alignItems="center">
+            <Heading size="md" noOfLines={1}>
+              {user.name || user.username}
+            </Heading>
+            <Badge fontSize="0.9em" variant={"outline"} {...roleBadgeProps}>
+              {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+            </Badge>
+          </Flex>
+          <Text fontSize="sm" color="gray.600" noOfLines={2}>
+            {user.bio || "No bio available."}
+          </Text>
           <Flex alignItems="center" gap={2}>
-            <MdWork />
-            <Text fontSize="sm">{user.jobTitle || "Software Engineer"}</Text>
+            <Icon as={MdWork} />
+            <Text fontSize="sm">{user.jobTitle || "Professional"}</Text>
           </Flex>
           <Flex alignItems="center" gap={2}>
-            <MdLocationCity />
+            <Icon as={MdLocationCity} />
             <Text fontSize="sm">
-              {user.city || "San Francisco"},{user.country || "CA"}
+              {user.city || "City"}, {user.country || "Country"}
             </Text>
           </Flex>
           <Flex alignItems="center" gap={2} wrap="wrap">
-            <MdInterests />
-            {user.interests?.map((interest) => (
+            <Icon as={MdInterests} />
+            {user.interests?.slice(0, 3).map((interest) => (
               <Tag
                 key={interest}
                 size="sm"
-                colorScheme="yellow"
+                colorScheme="blue"
                 borderRadius="full"
               >
                 {interest}
               </Tag>
             ))}
+            {user.interests && user.interests.length > 3 && (
+              <Tag size="sm" colorScheme="blue" borderRadius="full">
+                +{user.interests.length - 3}
+              </Tag>
+            )}
           </Flex>
-          <Text fontSize="sm" color="gray.500" noOfLines={2}>
-            {user.bio ||
-              "Passionate about technology and building innovative solutions."}
-          </Text>
-        </VStack>
-        <HStack p={1}>
-          <Button
-            aria-label="message"
-            variant={"light"}
-            p={2}
-            h={"100%"}
-            onClick={() => onMessageClick(user.username)}
-          >
-            <MdMessage color="white" />
-          </Button>
-          <Button variant={"light"} size={"sm"} alignSelf={"center"}>
+          <Button variant="outline" size="sm">
             View Profile
           </Button>
-        </HStack>
+          {onMessageClick && (
+            <Button
+              variant="solid"
+              colorScheme="yellow"
+              size="sm"
+              onClick={(event) => {
+                event.stopPropagation();
+                onMessageClick(user.id);
+              }}
+            >
+              Message
+            </Button>
+          )}
+        </Stack>
       </CardBody>
     </Card>
   );

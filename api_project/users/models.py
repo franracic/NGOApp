@@ -96,3 +96,35 @@ class IActivity(models.Model):
     action = models.CharField(max_length=100)
     target = models.CharField(max_length=100, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+class Connection(models.Model):
+    user1 = models.ForeignKey(User, related_name='connections_initiated', on_delete=models.CASCADE)
+    user2 = models.ForeignKey(User, related_name='connections_received', on_delete=models.CASCADE)
+    connected_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user1} connected with {self.user2}"
+
+    class Meta:
+        unique_together = ('user1', 'user2')
+
+class ConnectionRequest(models.Model):
+    sender = models.ForeignKey(User, related_name='connection_requests_sent', on_delete=models.CASCADE)
+    recipient = models.ForeignKey(User, related_name='connection_requests_received', on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=(('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')), default='pending')
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('sender', 'recipient')
+
+    def __str__(self):
+        return f"{self.sender} sent a connection request to {self.recipient}"
+
+class Message(models.Model):
+    sender = models.ForeignKey(User, related_name='messages_sent', on_delete=models.CASCADE)
+    recipient = models.ForeignKey(User, related_name='messages_received', on_delete=models.CASCADE)
+    content = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender} sent a message to {self.recipient}"

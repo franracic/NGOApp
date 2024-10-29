@@ -15,6 +15,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { NavigationMenu } from "./NavigationMenu";
+import { ProfileMenu } from "./desktopNavigation";
 
 export const MobileNavigation = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -48,6 +49,7 @@ export const MobileNavigation = () => {
           <DrawerBody>
             <VStack alignItems="flex-start" spacing={4}>
               <NavigationMenu isOpen={true} onSelect={handleSelect} />
+              <ProfileMenu />
             </VStack>
           </DrawerBody>
         </DrawerContent>

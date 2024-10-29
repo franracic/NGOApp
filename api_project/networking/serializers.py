@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from users.serializers import BasicUserSerializer
-from .models import IResource, IDiscussion, Trophy, TrophyTemplate, UserInput
+from .models import IResource, IDiscussion, Notification, Trophy, TrophyTemplate, UserInput
 
 class IResourceSerializer(serializers.ModelSerializer):
     createdBy = BasicUserSerializer(read_only=True)
@@ -32,3 +32,23 @@ class IDiscussionSerializer(serializers.ModelSerializer):
     class Meta:
         model = IDiscussion
         fields = '__all__'
+
+class NotificationSerializer(serializers.ModelSerializer):
+    sender_username = serializers.CharField(source='sender.username', read_only=True)
+    related_menu_item = serializers.CharField()
+
+    class Meta:
+        model = Notification
+        fields = [
+            'id',
+            'recipient',
+            'sender',
+            'sender_username',
+            'notification_type',
+            'message',
+            'is_read',
+            'created_at',
+            'related_object_id',
+            'related_menu_item',
+        ]
+        read_only_fields = ['recipient', 'created_at']

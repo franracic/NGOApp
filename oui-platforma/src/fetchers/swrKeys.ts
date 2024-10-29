@@ -32,4 +32,9 @@ export const swrKeys = {
   trophies: `${apiUrl}/networking/trophies/`,
   userInputs: `${apiUrl}/networking/user-inputs/`,
   trophyTemplates: `${apiUrl}/networking/trophy-templates/with_user_progress/`,
+  users: `${apiUrl}/users/users/`,
+  connections: `${apiUrl}/users/connections/`,
+  connectionRequests: `${apiUrl}/users/connection-requests/`,
+  messages: `${apiUrl}/users/messages/`,
+  notifications: `${apiUrl}/networking/notifications/`,
 };

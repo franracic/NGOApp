@@ -23,6 +23,7 @@ const floating = definePartsStyle({
       },
     label: {
       maxHeight: "20px",
+      maxWidth: "70%",
       overflow: "hidden",
       position: "absolute",
       top: "7px",
@@ -36,6 +37,8 @@ const floating = definePartsStyle({
       my: 2,
       transformOrigin: "left top",
       transition: "transform 0.2s ease-out",
+      whiteSpace: "nowrap",
+      textOverflow: "ellipsis",
     },
   },
   field: {

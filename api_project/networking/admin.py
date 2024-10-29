@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import IResource, IDiscussion, Trophy, UserInput
+from .models import IResource, IDiscussion, Trophy, UserInput, Notification
 from django import forms
 
 class IResourceAdminForm(forms.ModelForm):
@@ -40,3 +40,4 @@ class IDiscussionAdmin(admin.ModelAdmin):
     search_fields = ('title', 'author', 'content')
     list_filter = ('author', 'timestamp')
 
+admin.site.register(Notification)

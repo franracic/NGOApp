@@ -55,16 +55,16 @@ export interface IResource extends INewResource {
 }
 
 export interface IUser {
+  id: number;
+  username: string;
   name: string;
   email: string;
-  avatar: string;
-  username: string;
+  avatar?: string;
   interests?: string[];
-  city: string;
-  id: number;
-  jobTitle: string;
+  city?: string;
+  jobTitle?: string;
   bio?: string;
-  country: string;
+  country?: string;
   isNetworking?: boolean;
   website?: string;
   linkedin?: string;
@@ -73,18 +73,42 @@ export interface IUser {
   availabilityStatus?: string;
   activityLevel?: number;
   experiencePoints?: number;
-  level: number;
+  level?: number;
   connectionsCount?: number;
   isMentor?: boolean;
   expertise?: string[];
   mentees?: IUser[];
-  role: string;
-  activity?: IActivity[];
+  completed_courses_count?: number;
+  submitted_resources_count?: number;
+  connections_count?: number;
+  login_streak?: number;
+  comment_count?: number;
+  perfect_quizzes_count?: number;
+  liked_resources_count?: number;
+  viewed_resources_count?: number;
+  time_spent_learning?: number;
+  role: "beginner" | "worker" | "mentor" | "admin" | "practitioner";
   events?: IEvent[];
-  groups?: IGroup[];
-  trophies?: ITrophy[];
-  likedResources?: number[];
-  completed_courses_count?: number[];
+}
+
+export interface INotification {
+  id: number;
+  recipient: number;
+  sender: number | null;
+  sender_username: string | null;
+  notification_type: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+  related_object_id: number | null;
+  related_menu_item: string | null;
+}
+
+export interface IConnection {
+  id: number;
+  sender: IUser;
+  receiver: IUser;
+  isAccepted: boolean;
 }
 
 export interface ITrophy {
@@ -105,6 +129,13 @@ export interface IUserInput {
   title?: string;
   content: string;
   bg_color?: string;
+}
+
+export interface IMessage {
+  id: number;
+  sender: IUser;
+  recipient: IUser;
+  content: string;
 }
 
 export interface IActivity {

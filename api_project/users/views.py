@@ -17,6 +17,18 @@ from rest_framework.authtoken.models import Token
 from rest_framework import generics
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import User, Connection, ConnectionRequest, Message
+from .serializers import (
+    UserSerializer,
+    BasicUserSerializer,
+    ConnectionRequestSerializer,
+    ConnectionSerializer,
+    MessageSerializer,
+)
+from django.db.models import Q
 
 class LargeResultsSetPagination(PageNumberPagination):
     page_size = 10
@@ -25,18 +37,18 @@ class LargeResultsSetPagination(PageNumberPagination):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-    pagination_class = LargeResultsSetPagination
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_class = UserFilter
-    search_fields = ['username', 'bio', 'expertise']
-    ordering_fields = ['level', 'experiencePoints', 'connectionsCount']
-    permission_classes = [AllowAny]
+    serializer_class = BasicUserSerializer
+    permission_classes = [IsAuthenticated]
 
-    def get_serializer_class(self):
-        if self.action == 'retrieve':
-            return BasicUserSerializer
-        return super().get_serializer_class()
+    def get_queryset(self):
+        search_query = self.request.query_params.get('search', '')
+        return User.objects.filter(
+            Q(username__icontains=search_query) |
+            Q(jobTitle__icontains=search_query) |
+            Q(city__icontains=search_query) |
+            Q(country__icontains=search_query) |
+            Q(interests__icontains=search_query)
+        ).exclude(id=self.request.user.id)
 
 class IGroupViewSet(viewsets.ModelViewSet):
     queryset = IGroup.objects.all()
@@ -121,3 +133,77 @@ class MeView(APIView):
         user = request.user
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ConnectionRequestViewSet(viewsets.ModelViewSet):
+    queryset = ConnectionRequest.objects.all()
+    serializer_class = ConnectionRequestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return ConnectionRequest.objects.filter(recipient=self.request.user, status='pending')
+
+    def create(self, request):
+        recipient_id = request.data.get('recipient_id')
+        if not recipient_id:
+            return Response({'error': 'Recipient ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        recipient = User.objects.get(id=recipient_id)
+        if ConnectionRequest.objects.filter(sender=request.user, recipient=recipient).exists():
+            return Response({'error': 'Connection request already sent.'}, status=status.HTTP_400_BAD_REQUEST)
+        ConnectionRequest.objects.create(sender=request.user, recipient=recipient)
+        return Response({'status': 'Connection request sent.'}, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['post'])
+    def accept(self, request):
+        print(request, "<----------------")
+        request_id = request.data.get('request_id')
+        connection_request = ConnectionRequest.objects.get(id=request_id, recipient=request.user)
+        connection_request.status = 'accepted'
+        connection_request.save()
+        Connection.objects.create(user1=request.user, user2=connection_request.sender)
+        return Response({'status': 'Connection accepted.'}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def reject(self, request):
+        request_id = request.data.get('request_id')
+        connection_request = ConnectionRequest.objects.get(id=request_id, recipient=request.user)
+        connection_request.status = 'rejected'
+        connection_request.save()
+        return Response({'status': 'Connection rejected.'}, status=status.HTTP_200_OK)
+
+class ConnectionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Connection.objects.all()
+    serializer_class = BasicUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        connections = Connection.objects.filter(
+            Q(user1=self.request.user) | Q(user2=self.request.user)
+        )
+
+        connected_user_ids = connections.values_list('user1', 'user2')
+        connected_user_ids = set(
+            uid for pair in connected_user_ids for uid in pair if uid != self.request.user.id
+        )
+        print(connected_user_ids,User.objects.filter(id__in=connected_user_ids))
+
+        return User.objects.filter(id__in=connected_user_ids)
+
+class MessageViewSet(viewsets.ModelViewSet):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user_id = self.request.query_params.get('user_id')
+        return Message.objects.filter(
+            (Q(sender=self.request.user) & Q(recipient__id=user_id)) |
+            (Q(sender__id=user_id) & Q(recipient=self.request.user))
+        ).order_by('sent_at')
+
+    def create(self, request):
+        recipient_id = request.data.get('recipient_id')
+        content = request.data.get('content')
+        recipient = User.objects.get(id=recipient_id)
+        message = Message.objects.create(sender=request.user, recipient=recipient, content=content)
+        serializer = self.get_serializer(message)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
