@@ -1,5 +1,3 @@
-// src/components/navigation/NavigationMenu.tsx
-
 "use client";
 
 import {
@@ -21,7 +19,6 @@ import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import { FaHandshakeAngle } from "react-icons/fa6";
 import {
-  MdEdit,
   MdGroup,
   MdHome,
   MdImportContacts,
@@ -88,7 +85,6 @@ const SIDEBAR_ITEMS: Array<ISidebarItem> = [
     icon: <MdGroup />,
     key: "networking",
   },
-  { label: "Admin", href: "/new-course", icon: <MdEdit />, key: "admin" },
 ];
 
 interface NavigationMenuProps {
@@ -100,16 +96,18 @@ export const NavigationMenu = ({ isOpen, onSelect }: NavigationMenuProps) => {
   const pathname = usePathname();
   const { data: notifications } = useNotifications();
 
-  const notificationsByMenuItem = notifications?.reduce((acc, notification) => {
-    const key = notification.related_menu_item;
-    if (key) {
-      if (!acc[key]) {
-        acc[key] = [];
+  const notificationsByMenuItem = notifications
+    ?.filter((notification) => !notification.is_read)
+    .reduce((acc, notification) => {
+      const key = notification.related_menu_item;
+      if (key) {
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key].push(notification);
       }
-      acc[key].push(notification);
-    }
-    return acc;
-  }, {} as { [key: string]: INotification[] });
+      return acc;
+    }, {} as { [key: string]: INotification[] });
 
   return (
     <VStack spacing={1} alignItems="stretch">

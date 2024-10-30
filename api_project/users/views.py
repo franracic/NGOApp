@@ -1,10 +1,12 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import User, IGroup, IActivity
-from .serializers import UserSerializer, BasicUserSerializer, IGroupSerializer, IActivitySerializer
+from .models import GroupMessage, MentorshipRequest, User, IGroup, IActivity
+from .serializers import GroupMessageSerializer, MentorshipRequestSerializer, UserSerializer, BasicUserSerializer, IGroupSerializer, IActivitySerializer
 from .filters import UserFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -28,7 +30,7 @@ from .serializers import (
     ConnectionSerializer,
     MessageSerializer,
 )
-from django.db.models import Q
+from django.db.models import Q, Count, F
 
 class LargeResultsSetPagination(PageNumberPagination):
     page_size = 10
@@ -49,14 +51,63 @@ class UserViewSet(viewsets.ModelViewSet):
             Q(country__icontains=search_query) |
             Q(interests__icontains=search_query)
         ).exclude(id=self.request.user.id)
+    
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def available_mentors(self, request):
+        mentors = User.objects.filter(
+            isMentor=True
+        ).annotate(
+            mentee_count=Count('mentees')
+        ).filter(
+            mentee_count__lt=F('max_mentees')
+        )
+        serializer = BasicUserSerializer(mentors, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def mentees(self, request):
+        user = request.user
+        if not user.isMentor:
+            return Response({'detail': 'Not a mentor.'}, status=status.HTTP_403_FORBIDDEN)
+        mentees = user.mentees.all()
+        serializer = BasicUserSerializer(mentees, many=True)
+        return Response(serializer.data)
 
-class IGroupViewSet(viewsets.ModelViewSet):
-    queryset = IGroup.objects.all()
-    serializer_class = IGroupSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['level']
-    search_fields = ['name', 'description']
-    ordering_fields = ['members', 'level']
+    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    def dashboard(self, request, pk=None):
+        user = request.user
+        mentee = get_object_or_404(User, pk=pk)
+        if mentee.mentor != user:
+            return Response({'detail': 'You do not have permission to view this user\'s dashboard.'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = UserSerializer(mentee)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def mentor(self, request):
+        user = request.user
+        mentor = user.mentor
+        if not mentor:
+            return Response({'detail': 'No mentor assigned.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = UserSerializer(mentor)
+        return Response(serializer.data)
+    
+class GroupMessageViewSet(viewsets.ModelViewSet):
+    queryset = GroupMessage.objects.all()
+    serializer_class = GroupMessageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        group_id = self.request.query_params.get('group_id')
+        group = get_object_or_404(IGroup, id=group_id)
+        if not group.is_member(self.request.user):
+            raise PermissionDenied("You're not a member of this group.")
+        return group.messages.all()
+
+    def perform_create(self, serializer):
+        group = serializer.validated_data['group']
+        if not group.is_member(self.request.user):
+            raise PermissionDenied("You're not a member of this group.")
+        serializer.save(sender=self.request.user)
 
 class IActivityViewSet(viewsets.ModelViewSet):
     queryset = IActivity.objects.all()
@@ -207,3 +258,46 @@ class MessageViewSet(viewsets.ModelViewSet):
         message = Message.objects.create(sender=request.user, recipient=recipient, content=content)
         serializer = self.get_serializer(message)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+class MentorshipRequestViewSet(viewsets.ModelViewSet):
+    queryset = MentorshipRequest.objects.all()
+    serializer_class = MentorshipRequestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if self.action == 'list':
+            return MentorshipRequest.objects.filter(mentor=user, status='pending')
+        return MentorshipRequest.objects.none()
+
+    def create(self, request):
+        mentor_id = request.data.get('mentor_id')
+        if not mentor_id:
+            return Response({'error': 'Mentor ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            mentor = User.objects.get(id=mentor_id, isMentor=True)
+        except User.DoesNotExist:
+            return Response({'error': 'Mentor not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if MentorshipRequest.objects.filter(sender=request.user, mentor=mentor).exists():
+            return Response({'error': 'Mentorship request already sent.'}, status=status.HTTP_400_BAD_REQUEST)
+        MentorshipRequest.objects.create(sender=request.user, mentor=mentor)
+        return Response({'status': 'Mentorship request sent.'}, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['post'])
+    def accept(self, request):
+        request_id = request.data.get('request_id')
+        mentorship_request = MentorshipRequest.objects.get(id=request_id, mentor=request.user)
+        mentorship_request.status = 'accepted'
+        mentorship_request.save()
+        mentee = mentorship_request.sender
+        mentee.mentor = request.user
+        mentee.save()
+        return Response({'status': 'Mentorship request accepted.'}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def reject(self, request):
+        request_id = request.data.get('request_id')
+        mentorship_request = MentorshipRequest.objects.get(id=request_id, mentor=request.user)
+        mentorship_request.status = 'rejected'
+        mentorship_request.save()
+        return Response({'status': 'Mentorship request rejected.'}, status=status.HTTP_200_OK)

@@ -83,13 +83,6 @@ class UserInput(models.Model):
     def __str__(self):
         return f"UserInput by {self.user.username}"
 
-
-class IDiscussion(models.Model):
-    title = models.CharField(max_length=100)
-    author = models.CharField(max_length=100)
-    content = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-
 class Notification(models.Model):
     NOTIFICATION_TYPES = (
         ('message', 'Message'),
@@ -127,3 +120,14 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.notification_type} to {self.recipient.username}"
+    
+class IEvent(models.Model):
+    name = models.CharField(max_length=255)
+    date = models.DateTimeField()
+    description = models.TextField()
+    attendees = models.ManyToManyField(User, related_name='events_attending', blank=True)
+    level = models.IntegerField(default=0)
+    tags = models.JSONField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name

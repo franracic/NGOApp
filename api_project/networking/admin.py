@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import IResource, IDiscussion, Trophy, UserInput, Notification
+
+from courses.models import IDiscussion
+from .models import IResource, Trophy, UserInput, Notification
 from django import forms
 
 class IResourceAdminForm(forms.ModelForm):

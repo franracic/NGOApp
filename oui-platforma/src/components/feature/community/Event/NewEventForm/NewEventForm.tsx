@@ -1,29 +1,43 @@
 import { IEvent } from "@/typings/course";
-import { Button, Card, Input, Textarea } from "@chakra-ui/react";
+import { Button, Card, Input, Textarea, useToast } from "@chakra-ui/react";
 import { useState } from "react";
 
 export const NewEventForm = ({
   addEvent,
 }: {
-  addEvent: (event: IEvent) => void;
+  addEvent: (event: Partial<IEvent>) => void;
 }) => {
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
   const [description, setDescription] = useState("");
+  const [tagsInput, setTagsInput] = useState("");
+  const toast = useToast();
 
   const handleSubmit = () => {
-    const newEvent: IEvent = {
-      id: Math.random(), // Use a proper ID generator in a real app
+    if (!name.trim() || !date.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Name and date are required.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
+
+    const newEvent: Partial<IEvent> = {
       name,
-      date: new Date(date),
+      date,
       description,
-      attendees: 0,
-      level: 10,
+      tags,
     };
     addEvent(newEvent);
     setName("");
     setDate("");
     setDescription("");
+    setTagsInput("");
   };
 
   return (
@@ -35,7 +49,7 @@ export const NewEventForm = ({
         mb={4}
       />
       <Input
-        type="date"
+        type="datetime-local"
         value={date}
         onChange={(e) => setDate(e.target.value)}
         mb={4}
@@ -44,6 +58,12 @@ export const NewEventForm = ({
         placeholder="Event Description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
+        mb={4}
+      />
+      <Input
+        placeholder="Tags (comma separated)"
+        value={tagsInput}
+        onChange={(e) => setTagsInput(e.target.value)}
         mb={4}
       />
       <Button onClick={handleSubmit} variant="light">

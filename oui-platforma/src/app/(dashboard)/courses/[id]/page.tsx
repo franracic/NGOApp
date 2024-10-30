@@ -12,7 +12,8 @@ export default function Course() {
 
   const { data: course, error: courseError } = useSWR(
     id ? swrKeys.editCourse(parseInt(id)) : null,
-    fetcher<ICourse>
+    fetcher<ICourse>,
+    { refreshInterval: 10000 }
   );
 
   if (courseError) {

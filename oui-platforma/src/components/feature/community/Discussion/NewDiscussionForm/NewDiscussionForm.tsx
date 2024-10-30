@@ -1,26 +1,35 @@
+"use client";
 import { IDiscussion } from "@/typings/course";
-import { Button, Card, Input, Textarea } from "@chakra-ui/react";
+import { Button, Card, Input, Textarea, useToast } from "@chakra-ui/react";
 import { useState } from "react";
 
 export const NewDiscussionForm = ({
   addDiscussion,
 }: {
-  addDiscussion: (discussion: IDiscussion) => void;
+  addDiscussion: (discussion: Partial<IDiscussion>) => void;
 }) => {
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [description, setDescription] = useState("");
+  const toast = useToast();
 
   const handleSubmit = () => {
-    const newDiscussion: IDiscussion = {
-      id: Math.random(), // Use a proper ID generator in a real app
+    if (!title.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Title is required.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const newDiscussion: Partial<IDiscussion> = {
       title,
-      author: "Current User", // Replace with actual user data
-      content,
-      timestamp: new Date(),
+      description,
     };
     addDiscussion(newDiscussion);
     setTitle("");
-    setContent("");
   };
 
   return (
@@ -32,9 +41,9 @@ export const NewDiscussionForm = ({
         mb={4}
       />
       <Textarea
-        placeholder="Discussion Content"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
+        placeholder="Discussion description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
         mb={4}
         variant={"dark"}
       />

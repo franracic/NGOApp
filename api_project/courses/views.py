@@ -11,6 +11,7 @@ from .models import (
     ICourseContent,
     ICourseSection,
     IAuthor,
+    IDiscussion,
     IUploadContent,
     UserCourseProgress,
     UserCourseContentProgress,
@@ -26,7 +27,7 @@ from .serializers import (
 )
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Avg
-
+from networking.signals import add_experience
 from courses import serializers
 
 ROLE_HIERARCHY = ['beginner','worker', 'practitioner', 'mentor','admin']
@@ -238,6 +239,11 @@ class ICourseContentViewSet(viewsets.ModelViewSet):
             course_progress.save()
             if completed_contents == all_contents.count():
                 course_progress, created = UserCourseProgress.objects.get_or_create(user=user, course=course)
+                if course.type in ['Lecture', 'Workshop']:
+                    add_experience(user, 150)
+                else:
+                    add_experience(user, 200)
+
                 if not course_progress.is_completed:
                     course_progress.is_completed = True
                     course_progress.progress = 100
@@ -307,20 +313,32 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         parent_id = self.request.data.get('parent_id')
         course_id = self.request.data.get('course_id')
+        discussion_id = self.request.data.get('discussion_id')
         parent = None
         course = None
+        discussion = None
 
         if parent_id:
             parent = get_object_or_404(IComment, id=parent_id)
-            course = parent.courses.first()
-            if not course:
-                raise serializers.ValidationError("Parent comment is not associated with any course.")
+            if parent.courses.exists():
+                print("parent.courses",parent.courses.all())
+                course = parent.courses.all().first()
+            elif parent.discussions.exists():
+                print("parent.discussions",parent.discussions.all())
+                discussion = parent.discussions.all().first()
+            else:
+                raise serializers.ValidationError("Parent comment is not associated with any course or discussion.")
         else:
-            if not course_id:
+            if not course_id and not discussion_id:
                 raise serializers.ValidationError("Course ID is required for top-level comments.")
-            course = get_object_or_404(ICourse, id=course_id)
-
-        serializer.save(user=self.request.user, parent=parent, courses=[course])
+            if course_id:
+                course = get_object_or_404(ICourse, id=course_id)
+            if discussion_id:
+                discussion = get_object_or_404(IDiscussion, id=discussion_id)
+        if not course:
+            serializer.save(user=self.request.user, parent=parent, discussions=[discussion])
+        else:
+            serializer.save(user=self.request.user, parent=parent, courses=[course])
     
     def get_serializer_context(self):
         context = super().get_serializer_context()

@@ -7,6 +7,7 @@ import {
   Badge,
   Box,
   Button,
+  Card,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -39,19 +40,21 @@ import useSWR from "swr";
 
 export const UserProfile = ({
   userId,
-  isOpen,
-  onClose,
+  isOpen = false,
+  onClose = () => {},
   onConnectionRequest,
+  isInline,
 }: {
   userId: number;
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   onConnectionRequest?: (userId: number) => void;
+  isInline?: boolean;
 }) => {
   const { data: user } = useSWR(swrKeys.userInfo(userId), fetcher<IUser>);
 
   if (!user) {
-    return <div data-testid="placeholder">Loading...</div>;
+    return null;
   }
 
   const getRoleBadgeProps = (role: string) => {
@@ -75,6 +78,138 @@ export const UserProfile = ({
   };
 
   const roleBadgeProps = getRoleBadgeProps(user.role);
+
+  if (isInline) {
+    return (
+      <Card p={4} variant={"light"}>
+        <Box position="relative" width="100%" mb={4}>
+          <Image
+            src={user.avatar || "https://placehold.co/400x600"}
+            alt={user.username}
+            h="220px"
+            w="100%"
+            objectFit="cover"
+            borderRadius="lg"
+          />
+        </Box>
+        <Flex flexDirection="column">
+          <Stack spacing={3}>
+            <Flex justifyContent="space-between" alignItems="center">
+              <Heading size="md" noOfLines={1}>
+                {user.name || user.username}
+              </Heading>
+              <Badge fontSize="0.9em" {...roleBadgeProps}>
+                {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+              </Badge>
+            </Flex>
+            <Text fontSize="sm" color="gray.600" noOfLines={2}>
+              {user.bio || "No bio available."}
+            </Text>
+            <Flex alignItems="center" gap={2}>
+              <Icon as={MdWork} />
+              <Text fontSize="sm">{user.jobTitle || "Professional"}</Text>
+            </Flex>
+            <Flex alignItems="center" gap={2}>
+              <Icon as={MdLocationCity} />
+              <Text fontSize="sm">
+                {user.city || "City"}, {user.country || "Country"}
+              </Text>
+            </Flex>
+            <Flex alignItems="center" gap={2} wrap="wrap">
+              <Icon as={MdInterests} />
+              {user.interests?.slice(0, 3).map((interest: string) => (
+                <Tag
+                  key={interest}
+                  size="sm"
+                  colorScheme="blue"
+                  borderRadius="full"
+                >
+                  {interest}
+                </Tag>
+              ))}
+              {user.interests && user.interests.length > 3 && (
+                <Tag size="sm" colorScheme="blue" borderRadius="full">
+                  +{user.interests.length - 3}
+                </Tag>
+              )}
+            </Flex>
+
+            <HStack mt={2} spacing={3} wrap="wrap">
+              <Tooltip label={`Level: ${user.level || 1}`}>
+                <Badge colorScheme="yellow">
+                  <Icon as={MdStar} mr={1} />
+                  Level {user.level || 1}
+                </Badge>
+              </Tooltip>
+              <Tooltip label={`XP: ${user.experiencePoints || 0}`}>
+                <Badge colorScheme="orange">
+                  <Icon as={FaLightbulb} mr={1} />
+                  {user.experiencePoints || 0} XP
+                </Badge>
+              </Tooltip>
+              <Tooltip
+                label={`Time Spent Learning: ${
+                  user.time_spent_learning || 0
+                } hrs`}
+              >
+                <Badge colorScheme="teal">
+                  <Icon as={FaClock} mr={1} />
+                  {user.time_spent_learning || 0} hrs
+                </Badge>
+              </Tooltip>
+            </HStack>
+
+            <Flex mt={4} justifyContent="space-between" alignItems="center">
+              <HStack spacing={2}>
+                {user.website && (
+                  <Button
+                    as="a"
+                    href={user.website}
+                    target="_blank"
+                    variant="ghost"
+                    size="sm"
+                  >
+                    <FaGlobe />
+                  </Button>
+                )}
+                {user.linkedin && (
+                  <Button
+                    as="a"
+                    href={user.linkedin}
+                    target="_blank"
+                    variant="ghost"
+                    size="sm"
+                  >
+                    <FaLinkedin />
+                  </Button>
+                )}
+                {user.twitter && (
+                  <Button
+                    as="a"
+                    href={user.twitter}
+                    target="_blank"
+                    variant="ghost"
+                    size="sm"
+                  >
+                    <FaTwitter />
+                  </Button>
+                )}
+              </HStack>
+              {onConnectionRequest && (
+                <Button
+                  onClick={() => onConnectionRequest(userId)}
+                  variant="outline"
+                  size="sm"
+                >
+                  Connect
+                </Button>
+              )}
+            </Flex>
+          </Stack>
+        </Flex>
+      </Card>
+    );
+  }
 
   return (
     <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="md">

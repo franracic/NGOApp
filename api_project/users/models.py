@@ -59,7 +59,6 @@ class User(AbstractUser):
     connectionsCount = models.IntegerField(null=True, blank=True)
     isMentor = models.BooleanField(default=False)
     expertise = models.JSONField(null=True, blank=True)
-    mentees = models.ManyToManyField('self', blank=True)
     completed_courses_count = models.IntegerField(default=0)
     submitted_resources_count = models.IntegerField(default=0)
     connections_count = models.IntegerField(default=0)
@@ -69,6 +68,8 @@ class User(AbstractUser):
     liked_resources_count = models.IntegerField(default=0)
     viewed_resources_count = models.IntegerField(default=0)
     time_spent_learning = models.FloatField(default=0.0)
+    mentor = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='mentees')
+    max_mentees = models.IntegerField(default=5)
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=BEGINNER)
 
@@ -85,10 +86,24 @@ class User(AbstractUser):
 
 class IGroup(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField()
-    members = models.IntegerField()
-    memberList = models.ManyToManyField(User)
-    level = models.IntegerField()
+    description = models.TextField(null=True, blank=True)
+    members = models.ManyToManyField(User, related_name='inGroups', blank=True)
+    logo_url = models.URLField(null=True, blank=True)
+    
+    def __str__(self):
+        return self.name
+
+    def is_member(self, user):
+        return self.members.filter(id=user.id).exists()
+    
+class GroupMessage(models.Model):
+    group = models.ForeignKey(IGroup, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.sender.username} in {self.group.name}"
 
 class IActivity(models.Model):
     userId = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -128,3 +143,19 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.sender} sent a message to {self.recipient}"
+    
+class MentorshipRequest(models.Model):
+    sender = models.ForeignKey(User, related_name='mentorship_requests_sent', on_delete=models.CASCADE)
+    mentor = models.ForeignKey(User, related_name='mentorship_requests_received', on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=(('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')),
+        default='pending'
+    )
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('sender', 'mentor')
+
+    def __str__(self):
+        return f"{self.sender} sent a mentorship request to {self.mentor}"

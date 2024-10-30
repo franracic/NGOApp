@@ -97,7 +97,7 @@ export const PTPSection = () => {
         img_url="https://cdn.b12.io/client_media/gksrF78w/7919db7e-54be-11ef-9fe1-0242ac110002-photo-1517048676732-d65bc937f952.jpg"
       />
       <Box mx="auto" mt={8} px={4} maxW="1600px" w={"full"}>
-        <ConnectionRequests onViewProfile={handleUserClick}/>
+        <ConnectionRequests onViewProfile={handleUserClick} />
 
         <Card mt={8} p={4} variant={"light"}>
           <Text fontSize="3xl" fontWeight="bold" mb={4} textAlign="center">

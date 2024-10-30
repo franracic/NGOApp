@@ -1,16 +1,10 @@
 from rest_framework import serializers
 
-from users.serializers import BasicUserSerializer, UserSerializer
-from .models import IComment, ICourse, ICourseContent, ICourseSection, IAuthor, IFormField, IQuizQuestion, IUploadContent, PollOption, PollQuestion, SurveyQuestion, UserCourseContentProgress, UserCourseProgress
+from users.serializers import BasicUserSerializer
+from .models import IComment, ICourse, ICourseContent, ICourseSection, IAuthor, IDiscussion, IFormField, IQuizQuestion, IUploadContent, PollOption, PollQuestion, SurveyQuestion, UserCourseContentProgress, UserCourseProgress
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-
-class UserCourseProgressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserCourseProgress
-        fields = ['is_unlocked', 'is_completed', 'progress']
-
 
 class IAuthorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,6 +16,7 @@ class CommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
     likes_count = serializers.IntegerField(source='likes.count', read_only=True)
     is_liked = serializers.SerializerMethodField()
+    discussions = serializers.PrimaryKeyRelatedField(queryset=IDiscussion.objects.all(), many=True, required=False)
     courses = serializers.PrimaryKeyRelatedField(queryset=ICourse.objects.all(), many=True, required=False)
 
     class Meta:

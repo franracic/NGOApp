@@ -8,10 +8,18 @@ export function getComments() {
   });
 }
 
-export function addComment(content: string, courseId: number) {
+export function addComment(
+  content: string,
+  courseId?: number,
+  discussionId?: number
+) {
   return fetcher<IComment>(swrKeys.comments, {
     method: "POST",
-    body: JSON.stringify({ content, course_id: courseId }),
+    body: JSON.stringify({
+      content,
+      course_id: courseId,
+      discussion_id: discussionId,
+    }),
   });
 }
 

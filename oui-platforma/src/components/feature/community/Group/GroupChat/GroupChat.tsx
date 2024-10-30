@@ -1,13 +1,12 @@
 import { fetcher } from "@/fetchers/fetcher";
-import { useMessages, useSendMessage } from "@/fetchers/networking";
+import { useGroupMessages, useSendGroupMessage } from "@/fetchers/networking";
 import { swrKeys } from "@/fetchers/swrKeys";
-import { IMessage, IUser } from "@/typings/course";
+import { IGroupMessage, IUser } from "@/typings/course";
 import { SearchIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
   Button,
-  Card,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -33,26 +32,24 @@ import useSWR from "swr";
 
 interface IMessageGroup {
   sender: IUser;
-  messages: IMessage[];
+  messages: IGroupMessage[];
 }
 
-export const ChatWindow = ({
-  userId,
+export const GroupChat = ({
+  groupId,
   isOpen = false,
   onClose = () => {},
-  isInline,
 }: {
-  userId: number;
+  groupId: number;
   isOpen?: boolean;
   onClose?: () => void;
-  isInline?: boolean;
 }) => {
   const [messageInput, setMessageInput] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: messages, mutate } = useMessages(userId);
-  const { trigger: sendMessage } = useSendMessage();
+  const { data: messages, mutate } = useGroupMessages(groupId);
+  const { trigger: sendMessage } = useSendGroupMessage();
   const { data: currentUser } = useSWR(swrKeys.currentUser, fetcher<IUser>);
   const toast = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -61,7 +58,7 @@ export const ChatWindow = ({
     if (messageInput.trim()) {
       try {
         await sendMessage({
-          recipient_id: userId,
+          group: groupId,
           content: messageInput,
         });
         setMessageInput("");
@@ -82,7 +79,7 @@ export const ChatWindow = ({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const groupMessages = (messages: IMessage[]): IMessageGroup[] => {
+  const groupMessages = (messages: IGroupMessage[]): IMessageGroup[] => {
     const groups: IMessageGroup[] = [];
     let lastSenderId: number | null = null;
     let currentGroup: IMessageGroup | null = null;
@@ -117,88 +114,6 @@ export const ChatWindow = ({
 
   const messageGroups = groupMessages(filteredMessages || []);
 
-  if (isInline) {
-    return (
-      <Card overflow="auto" p={4} variant={"light"}>
-        <Flex flexDirection="column">
-          <Box>
-            <Flex justify="space-between" align="center">
-              <Text>Chat</Text>
-              <IconButton
-                mr={4}
-                aria-label="Search"
-                icon={<FiSearch />}
-                onClick={() => setShowSearch(!showSearch)}
-                variant="ghost"
-              />
-            </Flex>
-
-            {showSearch && (
-              <InputGroup mt={2}>
-                <InputLeftElement pointerEvents="none">
-                  <SearchIcon color="gray.300" />
-                </InputLeftElement>
-                <Input
-                  placeholder="Search messages"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </InputGroup>
-            )}
-          </Box>
-
-          <Box flex="1" overflowY="auto" maxH={"400px"}>
-            <VStack align="stretch" spacing={4}>
-              {messageGroups.map((group, index) => (
-                <MessageGroup
-                  key={index}
-                  group={group}
-                  isCurrentUser={group.sender.id === currentUser?.id}
-                />
-              ))}
-              <div ref={messagesEndRef} />
-            </VStack>
-          </Box>
-
-          <Box>
-            <Flex w="full" align="center" position="relative">
-              <Button
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                variant="ghost"
-                mr={2}
-              >
-                😊
-              </Button>
-              {showEmojiPicker && (
-                <Box position="absolute" bottom="60px" zIndex={1000}>
-                  <EmojiPicker
-                    onEmojiClick={(emoji: EmojiClickData) =>
-                      setMessageInput((prev) => prev + emoji.emoji)
-                    }
-                  />
-                </Box>
-              )}
-              <Box flex="1">
-                <Textarea
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                  placeholder="Type a message"
-                />
-              </Box>
-              <Button
-                onClick={handleSendMessage}
-                variant="solid"
-                ml={2}
-                bg="yellow.400"
-              >
-                <FiSend size={20} />
-              </Button>
-            </Flex>
-          </Box>
-        </Flex>
-      </Card>
-    );
-  }
   return (
     <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="md">
       <DrawerOverlay />
@@ -283,12 +198,38 @@ export const ChatWindow = ({
   );
 };
 
-export interface MessageGroupProps {
+interface MessageBubbleProps {
+  message: IGroupMessage;
+  isCurrentUser: boolean;
+}
+
+const MessageBubble = ({ message, isCurrentUser }: MessageBubbleProps) => {
+  const sanitizedContent = DOMPurify.sanitize(message.content);
+
+  return (
+    <Box
+      bg={isCurrentUser ? "blue.500" : "gray.200"}
+      color={isCurrentUser ? "white" : "black"}
+      borderRadius="lg"
+      p={3}
+      mt={1}
+      maxWidth="70%"
+      alignSelf={isCurrentUser ? "flex-end" : "flex-start"}
+    >
+      <div
+        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+        style={{ wordWrap: "break-word" }}
+      />
+    </Box>
+  );
+};
+
+interface MessageGroupProps {
   group: IMessageGroup;
   isCurrentUser: boolean;
 }
 
-export const MessageGroup = ({ group, isCurrentUser }: MessageGroupProps) => {
+const MessageGroup = ({ group, isCurrentUser }: MessageGroupProps) => {
   return (
     <Flex
       flexDirection="column"
@@ -313,31 +254,5 @@ export const MessageGroup = ({ group, isCurrentUser }: MessageGroupProps) => {
         />
       ))}
     </Flex>
-  );
-};
-
-export interface MessageBubbleProps {
-  message: IMessage;
-  isCurrentUser: boolean;
-}
-
-export const MessageBubble = ({ message, isCurrentUser }: MessageBubbleProps) => {
-  const sanitizedContent = DOMPurify.sanitize(message.content);
-
-  return (
-    <Box
-      bg={isCurrentUser ? "blue.500" : "gray.200"}
-      color={isCurrentUser ? "white" : "black"}
-      borderRadius="lg"
-      p={3}
-      mt={1}
-      maxWidth="70%"
-      alignSelf={isCurrentUser ? "flex-end" : "flex-start"}
-    >
-      <div
-        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-        style={{ wordWrap: "break-word" }}
-      />
-    </Box>
   );
 };

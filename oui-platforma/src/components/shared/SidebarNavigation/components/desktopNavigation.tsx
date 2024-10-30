@@ -1,5 +1,7 @@
 "use client";
+import { fetcher } from "@/fetchers/fetcher";
 import { swrKeys } from "@/fetchers/swrKeys";
+import { IUser } from "@/typings/course";
 import {
   Avatar,
   Button,
@@ -20,11 +22,12 @@ import {
   MdHelp,
   MdQuestionAnswer,
 } from "react-icons/md";
-import { mutate } from "swr";
+import useSWR, { mutate } from "swr";
 import { NavigationMenu } from "./NavigationMenu";
 
 export const ProfileMenu = () => {
   const router = useRouter();
+  const { data: currentUser } = useSWR(swrKeys.currentUser, fetcher<IUser>);
 
   const handleLogout = () => {
     router.push("/login");
@@ -36,7 +39,12 @@ export const ProfileMenu = () => {
   return (
     <Menu>
       <MenuButton as={Button} p={2} w="100%">
-        <Avatar size="sm" name="Fran Racic" bg="yellowDark" />
+        <Avatar
+          size="sm"
+          name={currentUser?.name}
+          bg="yellowDark"
+          src={currentUser?.avatar}
+        />
       </MenuButton>
       <MenuList>
         <MenuGroup title="Profile">

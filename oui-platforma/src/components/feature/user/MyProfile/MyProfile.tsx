@@ -6,49 +6,21 @@ import {
   Button,
   Card,
   Heading,
-  List,
-  ListItem,
   SimpleGrid,
   Text,
   useToast,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { FaAward, FaCertificate, FaMedal, FaTrophy } from "react-icons/fa";
 import useSWR from "swr";
-import { AchievementsSection } from "./components/AchievementsSection";
 import { ActivityFeed } from "./components/Activity";
 import { AvatarSection } from "./components/AvatarSection";
 import { CroppingModal } from "./components/CroppingModal";
-import { MentorshipCard } from "./components/MentorshipCard";
 import { NetworkingStatus } from "./components/NetworkingStatus";
 import { ProfileBio } from "./components/ProfileBio";
 import { ProfileCompletionMeter } from "./components/ProfileCompletition";
 import { ProfileDetails } from "./components/ProfileDetails";
 import { ProfileLinks } from "./components/ProfileLinks";
 import { SocialsCard } from "./components/SocialsCard";
-
-const defaultAchievements = [
-  {
-    title: "Profile Completed",
-    description: "Completed 100% of your profile.",
-    icon: FaMedal,
-  },
-  {
-    title: "5 Years of Experience",
-    description: "Marked 5 years in your current field.",
-    icon: FaTrophy,
-  },
-  {
-    title: "Top Contributor",
-    description: "Recognized as a top contributor in the community.",
-    icon: FaAward,
-  },
-  {
-    title: "Certified Professional",
-    description: "Earned a professional certification.",
-    icon: FaCertificate,
-  },
-];
 
 export const MyProfile: React.FC<{ userId: string }> = ({ userId }) => {
   const {
@@ -64,6 +36,7 @@ export const MyProfile: React.FC<{ userId: string }> = ({ userId }) => {
 
   if (error) return <div>Failed to load profile</div>;
   if (!user) return <div>Loading...</div>;
+  console.log(user);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -130,6 +103,8 @@ export const MyProfile: React.FC<{ userId: string }> = ({ userId }) => {
     }
   };
 
+  if (!user) return null;
+
   const handleSaveCroppedImage = async (croppedImage: string) => {
     try {
       const blob = await (await fetch(croppedImage)).blob();
@@ -175,7 +150,7 @@ export const MyProfile: React.FC<{ userId: string }> = ({ userId }) => {
       <SimpleGrid columns={[1, 2, 3, 4]} spacing="6">
         <Card gap={8} p={4}>
           <AvatarSection
-            avatar={user.avatar}
+            avatar={user.avatar || ""}
             isEditing={isEditing}
             handleFileChange={handleFileChange}
           />
@@ -195,50 +170,26 @@ export const MyProfile: React.FC<{ userId: string }> = ({ userId }) => {
             handleInputChange={handleInputChange}
           />
         </Card>
-        {user.isMentor ? (
-          <MentorshipCard user={user} />
-        ) : (
-          <Card gap={8} p={4}>
-            <Heading as="h2" size="md">
-              Profile Stats
-            </Heading>
-            <NetworkingStatus
-              isNetworking={user.isNetworking}
-              handleToggleNetworkingStatus={handleToggleNetworkingStatus}
-            />
-            <ProfileCompletionMeter user={user} />
-            <Text fontSize="sm" color="gray.400">
-              Activity Level: {user.activityLevel}
-            </Text>
-            <Text fontSize="sm" color="gray.400">
-              Experience Points: {user.experiencePoints}
-            </Text>
-            <Text fontSize="sm" color="gray.400">
-              Connections Count: {user.connectionsCount}
-            </Text>
-            {user.isMentor && (
-              <Box>
-                <Text fontSize="md" fontWeight="bold">
-                  Mentees
-                </Text>
-                <List spacing={3}>
-                  {user.mentees?.map((mentee, index) => (
-                    <ListItem key={index}>
-                      <Text>{mentee.name}</Text>
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
-            )}
-          </Card>
-        )}
         <Card gap={8} p={4}>
           <Heading as="h2" size="md">
-            Achievements
+            Profile Stats
           </Heading>
-          <AchievementsSection achievements={defaultAchievements} />
-          <ActivityFeed activities={user.activity} />
+          <NetworkingStatus
+            isNetworking={user.isNetworking}
+            handleToggleNetworkingStatus={handleToggleNetworkingStatus}
+          />
+          <ProfileCompletionMeter user={user} />
+          <Text fontSize="sm" color="gray.400">
+            Activity Level: {user.activityLevel}
+          </Text>
+          <Text fontSize="sm" color="gray.400">
+            Experience Points: {user.experiencePoints}
+          </Text>
+          <Text fontSize="sm" color="gray.400">
+            Connections Count: {user.connectionsCount}
+          </Text>
         </Card>
+        <ActivityFeed />
         <SocialsCard user={user} />
       </SimpleGrid>
       <Button

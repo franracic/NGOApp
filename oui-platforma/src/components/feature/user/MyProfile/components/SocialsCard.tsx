@@ -1,4 +1,3 @@
-// SocialsCard.tsx
 import { IUser } from "@/typings/course";
 import { Box, Card, Heading, List, ListItem, Text } from "@chakra-ui/react";
 import React from "react";

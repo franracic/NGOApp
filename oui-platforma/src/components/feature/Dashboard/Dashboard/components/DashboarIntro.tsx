@@ -17,9 +17,14 @@ import { MdEvent, MdLibraryBooks, MdPeople, MdSchool } from "react-icons/md";
 interface DashboardIntroProps {
   user: IUser;
   loading: boolean;
+  greeting?: string;
 }
 
-export const DashboardIntro = ({ user, loading }: DashboardIntroProps) => {
+export const DashboardIntro = ({
+  user,
+  loading,
+  greeting,
+}: DashboardIntroProps) => {
   const textColor = "gray.800";
   const cardBg = "white";
   const textSecondary = "gray.400";
@@ -28,9 +33,15 @@ export const DashboardIntro = ({ user, loading }: DashboardIntroProps) => {
   return (
     <Box h="auto" overflow="auto">
       <SkeletonText isLoaded={!loading} noOfLines={2} pb={4}>
-        <Heading as="h1" size="lg" fontWeight="semibold" color={textColor}>
-          Good afternoon, {user.name || user.username}
-        </Heading>
+        {greeting ? (
+          <Heading as="h1" size="lg" fontWeight="semibold" color={textColor}>
+            {greeting}
+          </Heading>
+        ) : (
+          <Heading as="h1" size="lg" fontWeight="semibold" color={textColor}>
+            Good afternoon, {user.name || user.username}
+          </Heading>
+        )}
       </SkeletonText>
       <SimpleGrid columns={{ base: 3, md: 6 }} spacing={4} mb={6}>
         <Box w="full" gridColumn={{ base: "span 3", md: "span 2" }}>

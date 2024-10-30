@@ -188,7 +188,7 @@ export const ResourceInvite = ({ currentUser }: { currentUser: IUser }) => {
         </Stack>
       </Box>
 
-      {(currentUser.role == "worker" || currentUser.role == "beginner") && (
+      {!(currentUser.role == "worker" || currentUser.role == "beginner") && (
         <Box bg="yellowDark" py={10} px={5}>
           <Flex
             alignItems="center"

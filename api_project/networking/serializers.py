@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from courses.models import IDiscussion
 from users.serializers import BasicUserSerializer
-from .models import IResource, IDiscussion, Notification, Trophy, TrophyTemplate, UserInput
+from .models import IEvent, IResource, Notification, Trophy, TrophyTemplate, UserInput
 
 class IResourceSerializer(serializers.ModelSerializer):
     createdBy = BasicUserSerializer(read_only=True)
@@ -29,6 +30,8 @@ class UserInputSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class IDiscussionSerializer(serializers.ModelSerializer):
+    author = BasicUserSerializer(read_only=True)
+
     class Meta:
         model = IDiscussion
         fields = '__all__'
@@ -52,3 +55,12 @@ class NotificationSerializer(serializers.ModelSerializer):
             'related_menu_item',
         ]
         read_only_fields = ['recipient', 'created_at']
+
+class IEventSerializer(serializers.ModelSerializer):
+    attendees = BasicUserSerializer(many=True, read_only=True)
+    attendees_count = serializers.IntegerField(source='attendees.count', read_only=True)
+    tags = serializers.ListField(child=serializers.CharField(), required=False)
+
+    class Meta:
+        model = IEvent
+        fields = ['id', 'name', 'date', 'description', 'attendees', 'attendees_count', 'level', 'tags']

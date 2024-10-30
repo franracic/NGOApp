@@ -1,8 +1,12 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import IResource, IDiscussion, Notification, TrophyTemplate
+
+from users.models import IGroup
+from users.serializers import IGroupSerializer
+from .models import IEvent, IResource, Notification, TrophyTemplate
 from .serializers import (
+    IEventSerializer,
     IResourceSerializer,
     IDiscussionSerializer,
     NotificationSerializer,
@@ -14,6 +18,8 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import viewsets, permissions
 from .models import Trophy, UserInput
+from courses.models import IComment, IDiscussion
+from courses.serializers import CommentSerializer
 from .serializers import UserInputSerializer
 
 class IResourceViewSet(viewsets.ModelViewSet):
@@ -78,6 +84,35 @@ class UserInputViewSet(viewsets.ModelViewSet):
 class IDiscussionViewSet(viewsets.ModelViewSet):
     queryset = IDiscussion.objects.all()
     serializer_class = IDiscussionSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticatedOrReadOnly])
+    def comments(self, request, pk=None):
+        discussion = self.get_object()
+        comments = discussion.comments.filter(parent__isnull=True).order_by('-timestamp')
+        serializer = CommentSerializer(comments, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def add_comment(self, request, pk=None):
+        discussion = self.get_object()
+        content = request.data.get('content')
+        parent_id = request.data.get('parent_id')
+        parent = None
+        if parent_id:
+            parent = IComment.objects.get(id=parent_id)
+
+        comment = IComment.objects.create(
+            discussion=discussion,
+            user=request.user,
+            content=content,
+            parent=parent
+        )
+        serializer = CommentSerializer(comment, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class TrophyTemplateViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = TrophyTemplate.objects.all()
@@ -128,3 +163,61 @@ class NotificationViewSet(viewsets.ModelViewSet):
             return Response({'status': 'Notification marked as read.'}, status=status.HTTP_200_OK)
         except Notification.DoesNotExist:
             return Response({'detail': 'Notification not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+class IGroupViewSet(viewsets.ModelViewSet):
+    queryset = IGroup.objects.all()
+    serializer_class = IGroupSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if self.action in ['list', 'retrieve', 'join', 'leave']:
+            return IGroup.objects.all()
+        return IGroup.objects.filter(members=self.request.user)
+
+    @action(detail=True, methods=['post'])
+    def join(self, request, pk=None):
+        try:
+            group = self.get_object()
+        except IGroup.DoesNotExist:
+            return Response({'detail': 'Group not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if group.is_member(request.user):
+            return Response({'detail': 'Already a member.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        group.members.add(request.user)
+        return Response({'status': 'Joined the group.'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def leave(self, request, pk=None):
+        group = self.get_object()
+        if not group.is_member(request.user):
+            return Response({'detail': 'Not a member.'}, status=status.HTTP_400_BAD_REQUEST)
+        group.members.remove(request.user)
+        return Response({'status': 'Left the group.'}, status=status.HTTP_200_OK)
+    
+
+class IEventViewSet(viewsets.ModelViewSet):
+    queryset = IEvent.objects.all()
+    serializer_class = IEventSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def attend(self, request, pk=None):
+        event = self.get_object()
+        user = request.user
+        if event.attendees.filter(id=user.id).exists():
+            return Response({'detail': 'You are already attending this event.'}, status=status.HTTP_400_BAD_REQUEST)
+        event.attendees.add(user)
+        return Response({'status': 'You are now attending this event.'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def unattend(self, request, pk=None):
+        event = self.get_object()
+        user = request.user
+        if not event.attendees.filter(id=user.id).exists():
+            return Response({'detail': 'You are not attending this event.'}, status=status.HTTP_400_BAD_REQUEST)
+        event.attendees.remove(user)
+        return Response({'status': 'You are no longer attending this event.'}, status=status.HTTP_200_OK)

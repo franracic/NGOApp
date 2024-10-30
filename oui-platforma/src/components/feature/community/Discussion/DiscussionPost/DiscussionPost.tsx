@@ -14,9 +14,10 @@ export const DiscussionPost = ({ discussion }: { discussion: IDiscussion }) => {
         {discussion.title}
       </Text>
       <Text fontSize="sm" color="gray.500">
-        By {discussion.author} on {discussion.timestamp.toLocaleString()}
+        By {discussion.author.name} on{" "}
+        {new Date(discussion.timestamp).toLocaleString()}
       </Text>
-      <Text mt={4}>{discussion.content}</Text>
+      <Text mt={4}>{discussion.description}</Text>
     </Card>
   );
 };

@@ -12,7 +12,7 @@ from courses.models import UserCourseProgress, UserCourseContentProgress, ICours
 from networking.models import Notification, Trophy, TrophyTemplate, IResource
 from django.contrib.auth.signals import user_logged_in
 
-from users.models import ConnectionRequest, Message
+from users.models import ConnectionRequest, MentorshipRequest, Message
 
 User = get_user_model()
 
@@ -39,7 +39,6 @@ def award_course_completion_trophies(sender, instance, created, **kwargs):
     for title in trophies_data:
         trophy_template = get_trophy_template(title)
         if trophy_template:
-            # Calculate progress percentage
             progress = min(int((user.completed_courses_count / trophy_template.target_value) * 100), 100)
             is_earned = progress >= 100
 
@@ -95,7 +94,6 @@ def award_role_trophies(sender, instance, created, **kwargs):
     if trophy_title:
         trophy_template = get_trophy_template(trophy_title)
         if trophy_template:
-            # For role trophies, progress is either 0 or 100
             progress = 100
             is_earned = True
 
@@ -310,14 +308,88 @@ def create_connection_request_notification(sender, instance, created, **kwargs):
             related_menu_item='peer_to_peer',
         )
 
-# Achievement Unlocked Notification
-@receiver(post_save, sender=Trophy)
-def create_achievement_notification(sender, instance, created, **kwargs):
-    if instance.is_earned:
+@receiver(post_save, sender=MentorshipRequest)
+def create_mentorship_request_notification(sender, instance, created, **kwargs):
+    if created and instance.status == 'pending':
         Notification.objects.create(
-            recipient=instance.user,
-            notification_type='achievement',
-            message=f'Congratulations! You have unlocked the "{instance.trophy_template.title}" achievement.',
+            recipient=instance.mentor,
+            sender=instance.sender,
+            notification_type='mentorship_request',
+            message=f'{instance.sender.username} sent you a mentorship request.',
             related_object_id=instance.id,
+            related_menu_item='mentorship',
+        )
+
+@receiver(post_save, sender=MentorshipRequest)
+def notify_mentee_on_accept(sender, instance, **kwargs):
+    if instance.status == 'accepted':
+        Notification.objects.create(
+            recipient=instance.sender,
+            sender=instance.mentor,
+            notification_type='mentorship_acceptance',
+            message=f'{instance.mentor.username} accepted your mentorship request.',
+            related_object_id=instance.id,
+            related_menu_item='mentorship',
+        )
+        add_experience(instance.sender, 100)
+
+def add_experience(user, amount):
+    user.experiencePoints += amount
+    level_ups = 0
+    while user.experiencePoints >= 1000:
+        user.experiencePoints -= 1000
+        user.level += 1
+        level_ups += 1
+    user.save()
+    if level_ups > 0:
+        Notification.objects.create(
+            recipient=user,
+            notification_type='level_up',
+            message=f'Congratulations! You have leveled up to level {user.level}.',
             related_menu_item='inspiration',
         )
+
+@receiver(post_save, sender=IResource)
+def award_resource_submission_trophies(sender, instance, created, **kwargs):
+    user = instance.createdBy
+    if created:
+        add_experience(user, 150)
+
+def get_xp_for_difficulty(difficulty):
+    xp_values = {
+        'Easy': 50,
+        'Medium': 100,
+        'Hard': 150,
+        'Very Hard': 200,
+    }
+    return xp_values.get(difficulty, 50)
+
+@receiver(post_save, sender=Trophy)
+def handle_trophy_post_save(sender, instance, created, **kwargs):
+    if instance.is_earned:
+        if created:
+            difficulty = instance.trophy_template.difficulty
+            xp = get_xp_for_difficulty(difficulty)
+            add_experience(instance.user, xp)
+
+            Notification.objects.create(
+                recipient=instance.user,
+                notification_type='achievement',
+                message=f'Congratulations! You have unlocked the "{instance.trophy_template.title}" achievement and gained {xp} XP.',
+                related_object_id=instance.id,
+                related_menu_item='inspiration',
+            )
+        else:
+            previous = Trophy.objects.filter(pk=instance.pk).first()
+            if previous and not previous.is_earned:
+                difficulty = instance.trophy_template.difficulty
+                xp = get_xp_for_difficulty(difficulty)
+                add_experience(instance.user, xp)
+
+                Notification.objects.create(
+                    recipient=instance.user,
+                    notification_type='achievement',
+                    message=f'Congratulations! You have unlocked the "{instance.trophy_template.title}" achievement and gained {xp} XP.',
+                    related_object_id=instance.id,
+                    related_menu_item='inspiration',
+                )

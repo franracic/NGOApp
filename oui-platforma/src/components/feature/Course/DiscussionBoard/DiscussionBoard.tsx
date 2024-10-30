@@ -21,9 +21,11 @@ import { CommentItem } from "./CommentItem";
 
 export const DiscussionBoard = ({
   courseId,
+  discussionId,
   commentIds,
 }: {
-  courseId: number;
+  courseId?: number;
+  discussionId?: number;
   commentIds: number[];
 }) => {
   const toast = useToast();
@@ -32,17 +34,21 @@ export const DiscussionBoard = ({
     data: comments,
     error,
     isLoading,
-  } = useSWR(swrKeys.multipleComments, () =>
-    fetcher<IComment[]>(swrKeys.multipleComments, {
-      method: "POST",
-      body: JSON.stringify({ ids: commentIds }),
-    })
+  } = useSWR(
+    swrKeys.multipleComments,
+    () =>
+      fetcher<IComment[]>(swrKeys.multipleComments, {
+        method: "POST",
+        body: JSON.stringify({ ids: commentIds }),
+      }),
+    { refreshInterval: 2000 }
   );
 
   const { trigger: triggerAddComment } = useSWRMutation(
     swrKeys.comments,
-    async (key, { arg }: { arg: { content: string } }) =>
-      addComment(arg.content, courseId),
+    async (key, { arg }: { arg: { content: string } }) => {
+      addComment(arg.content, courseId, discussionId);
+    },
     {
       onSuccess: (data) => {
         toast({
@@ -52,7 +58,8 @@ export const DiscussionBoard = ({
           duration: 5000,
           isClosable: true,
         });
-        mutate(swrKeys.comments, [...(comments || []), data], false);
+        mutate(swrKeys.comments);
+        mutate(swrKeys.multipleComments);
       },
       onError: () => {
         toast({
@@ -82,6 +89,7 @@ export const DiscussionBoard = ({
     if (newComment.trim()) {
       triggerAddComment({ content: newComment });
       setNewComment("");
+      mutate(swrKeys.comments);
     }
   };
 
@@ -89,7 +97,7 @@ export const DiscussionBoard = ({
   if (isLoading) return <Spinner />;
 
   return (
-    <Box mt={1}>
+    <Box mt={1} w={"full"}>
       <VStack align="stretch" spacing={4}>
         <Box>
           <Textarea

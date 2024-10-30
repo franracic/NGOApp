@@ -1,34 +1,97 @@
-import { IUser } from "@/typings/course";
-import { Box, Card, Grid, Heading, Text, VStack } from "@chakra-ui/react";
+"use client";
 
-export const MentorDashboard = ({ mentor }: { mentor: IUser }) => {
+import { fetcher } from "@/fetchers/fetcher";
+import { swrKeys } from "@/fetchers/swrKeys";
+import { ICourse, IUser } from "@/typings/course";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Flex,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalOverlay,
+  Text,
+} from "@chakra-ui/react";
+import useSWR from "swr";
+import { CourseList } from "../../courses/CourseList/CourseList";
+import { DashboardIntro } from "../../Dashboard/Dashboard/components/DashboarIntro";
+
+interface MenteeDashboardProps {
+  menteeId: number;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const MenteeDashboard = ({
+  menteeId,
+  isOpen,
+  onClose,
+}: MenteeDashboardProps) => {
+  const {
+    data: mentee,
+    error,
+    isLoading,
+  } = useSWR(
+    menteeId ? swrKeys.MenteeDashboard(menteeId) : null,
+    fetcher<IUser>
+  );
+
+  const {
+    data: courses,
+    error: coursesError,
+    isLoading: isCoursesLoading,
+  } = useSWR(swrKeys.courses, fetcher<ICourse[]>);
+
+  if (!menteeId || !mentee) {
+    return null;
+  }
+
+  const filteredCourses =
+    courses?.filter((course) => mentee.courses?.includes(course.id)) || [];
+
   return (
-    <Box>
-      <Heading size="lg" mb={4}>
-        Mentor Dashboard
-      </Heading>
-      {mentor.mentees && mentor.mentees.length > 0 ? (
-        <Grid templateColumns="repeat(3, 1fr)" gap={6}>
-          {mentor.mentees.map((mentee) => (
-            <Card key={mentee.id}>
-              <VStack align="start" spacing={2} p={4}>
-                <Text fontWeight="bold">{mentee.username}</Text>
-                <Text fontSize="sm" color="gray.500">
-                  {mentee.jobTitle}
-                </Text>
-                <Text fontSize="sm" color="gray.400">
-                  Progress: {mentee.activityLevel}% completed
-                </Text>
-                <Text fontSize="sm" color="gray.400">
-                  Points: {mentee.experiencePoints}
-                </Text>
-              </VStack>
-            </Card>
-          ))}
-        </Grid>
-      ) : (
-        <Text>No mentees assigned yet.</Text>
-      )}
-    </Box>
+    <Modal isOpen={isOpen} onClose={onClose} size="full">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalCloseButton />
+        <ModalBody>
+          {isLoading ? (
+            <Text>Loading...</Text>
+          ) : error ? (
+            <Alert status="error">
+              <AlertIcon />
+              <AlertTitle mr={2}>Error:</AlertTitle>
+              <AlertDescription>
+                Failed to load mentee&apos;s data. Please try again later.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <Box w="full">
+              <Flex
+                direction="column"
+                px={{ base: 2, md: 4 }}
+                py={{ base: 2, md: 4 }}
+              >
+                <DashboardIntro
+                  user={mentee}
+                  loading={isLoading}
+                  greeting={`${mentee.name}'s Dashboard`}
+                />
+                <CourseList
+                  courses={filteredCourses}
+                  loading={isLoading}
+                  maxCourses={3}
+                />
+              </Flex>
+            </Box>
+          )}
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 };

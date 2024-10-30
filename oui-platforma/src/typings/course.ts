@@ -78,6 +78,7 @@ export interface IUser {
   isMentor?: boolean;
   expertise?: string[];
   mentees?: IUser[];
+  mentor?: IUser;
   completed_courses_count?: number;
   submitted_resources_count?: number;
   connections_count?: number;
@@ -89,6 +90,8 @@ export interface IUser {
   time_spent_learning?: number;
   role: "beginner" | "worker" | "mentor" | "admin" | "practitioner";
   events?: IEvent[];
+  courses?: number[];
+  groups?: IGroup[];
 }
 
 export interface INotification {
@@ -138,6 +141,13 @@ export interface IMessage {
   content: string;
 }
 
+export interface IGroupMessage {
+  id: number;
+  sender: IUser;
+  group: IGroup;
+  content: string;
+}
+
 export interface IActivity {
   id: number;
   userId: string;
@@ -150,27 +160,32 @@ export interface IActivity {
 export interface IDiscussion {
   id: number;
   title: string;
-  author: string;
-  content: string;
+  author: IUser;
+  comments: number[];
   timestamp: Date;
+  description: string;
 }
 
 export interface IGroup {
   id: number;
   name: string;
   description: string;
-  members: number;
-  memberList: IUser[];
   level: number;
+  members_count: number;
+  is_member: boolean;
+  members: IUser[];
+  logo_url: string;
 }
 
 export interface IEvent {
   id: number;
   name: string;
-  date: Date;
+  date: string;
   description: string;
-  attendees: number;
+  attendees: IUser[];
+  attendees_count: number;
   level: number;
+  tags?: string[];
 }
 
 export interface IComment {
@@ -306,4 +321,12 @@ export interface IUploadContent extends ICourseContentBase {
   type: "upload";
   acceptedFileTypes?: string[];
   multiple?: boolean;
+}
+
+export interface IMentorshipRequest {
+  id: number;
+  sender: IUser;
+  mentor: IUser;
+  status: string;
+  sent_at: string;
 }

@@ -1,12 +1,17 @@
-// src/fetchers/networking.ts
-
-import { IConnection, IMessage, IUser } from "@/typings/course";
+import {
+  IConnection,
+  IDiscussion,
+  IEvent,
+  IGroup,
+  IGroupMessage,
+  IMessage,
+  IUser,
+} from "@/typings/course";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 import { fetcher } from "./fetcher";
 import { swrKeys } from "./swrKeys";
 
-// Fetch users with search functionality and pagination
 export const useUsers = (searchQuery: string = "", page: number = 1) => {
   const url = `${swrKeys.users}?search=${encodeURIComponent(
     searchQuery
@@ -14,17 +19,14 @@ export const useUsers = (searchQuery: string = "", page: number = 1) => {
   return useSWR(url, fetcher<IUser[]>);
 };
 
-// Fetch current user's connections
 export const useConnections = () => {
   return useSWR(swrKeys.connections, fetcher<IUser[]>);
 };
 
-// Fetch connection requests
 export const useConnectionRequests = () => {
   return useSWR(swrKeys.connectionRequests, fetcher<IConnection[]>);
 };
 
-// Send a connection request
 export const useSendConnectionRequest = () => {
   return useSWRMutation(
     swrKeys.connectionRequests,
@@ -37,7 +39,6 @@ export const useSendConnectionRequest = () => {
   );
 };
 
-// Accept a connection request
 export const useAcceptConnectionRequest = () => {
   return useSWRMutation(
     `${swrKeys.connectionRequests}accept/`,
@@ -50,7 +51,6 @@ export const useAcceptConnectionRequest = () => {
   );
 };
 
-// Reject a connection request
 export const useRejectConnectionRequest = () => {
   return useSWRMutation(
     `${swrKeys.connectionRequests}reject/`,
@@ -63,13 +63,16 @@ export const useRejectConnectionRequest = () => {
   );
 };
 
-// Fetch messages between the current user and another user
 export const useMessages = (userId: number) => {
   const url = `${swrKeys.messages}?user_id=${userId}`;
-  return useSWR(url, fetcher<IMessage[]>);
+  return useSWR(url, fetcher<IMessage[]>, { refreshInterval: 3000 });
 };
 
-// Send a message
+export const useGroupMessages = (groupId: number) => {
+  const url = `${swrKeys.groupMessages}?group_id=${groupId}`;
+  return useSWR(url, fetcher<IGroupMessage[]>, { refreshInterval: 3000 });
+};
+
 export const useSendMessage = () => {
   return useSWRMutation(
     swrKeys.messages,
@@ -85,8 +88,104 @@ export const useSendMessage = () => {
   );
 };
 
-// Fetch individual user info
 export const useUserInfo = (userId: number) => {
   const url = swrKeys.userInfo(userId);
   return useSWR(url, fetcher<IUser>);
+};
+
+export function newDiscussions(discussion: Partial<IDiscussion>) {
+  return fetcher<IDiscussion>(swrKeys.discussions, {
+    method: "POST",
+    body: JSON.stringify(discussion),
+  });
+}
+
+export const useJoinGroup = () => {
+  return useSWRMutation(
+    `${swrKeys.groups}`,
+    async (url: string, { arg: groupId }: { arg: number }) => {
+      return fetcher<void>(`${swrKeys.groups}${groupId}/join/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+  );
+};
+
+export const useLeaveGroup = () => {
+  return useSWRMutation(
+    `${swrKeys.groups}`,
+    async (url: string, { arg: groupId }: { arg: number }) => {
+      return fetcher<void>(`${swrKeys.groups}${groupId}/leave/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+  );
+};
+
+export const useSendGroupMessage = () => {
+  return useSWRMutation(
+    swrKeys.groupMessages,
+    async (url, { arg }: { arg: { group: number; content: string } }) => {
+      return fetcher<IMessage>(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(arg),
+      });
+    }
+  );
+};
+
+export function newGroup(group: Partial<IGroup>) {
+  return fetcher<IGroup>(swrKeys.groups, {
+    method: "POST",
+    body: JSON.stringify(group),
+  });
+}
+
+export const useEvents = () => {
+  return useSWR(swrKeys.events, fetcher<IEvent[]>);
+};
+
+export const useEvent = (id: number) => {
+  return useSWR(swrKeys.eventDetails(id), fetcher<IEvent>);
+};
+
+export const newEvent = (event: Partial<IEvent>) => {
+  return fetcher<IEvent>(swrKeys.events, {
+    method: "POST",
+    body: JSON.stringify(event),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};
+
+export const useAttendEvent = () => {
+  return useSWRMutation(
+    swrKeys.events,
+    async (url: string, { arg: eventId }: { arg: number }) => {
+      return fetcher(`${swrKeys.events}${eventId}/attend/`, {
+        method: "POST",
+      });
+    }
+  );
+};
+
+export const useUnattendEvent = () => {
+  return useSWRMutation(
+    swrKeys.events,
+    async (url: string, { arg: eventId }: { arg: number }) => {
+      return fetcher(`${swrKeys.events}${eventId}/unattend/`, {
+        method: "POST",
+      });
+    }
+  );
 };

@@ -1,9 +1,15 @@
 from rest_framework import serializers
 
+from courses.models import UserCourseProgress
 from networking.models import Trophy
-from .models import Connection, ConnectionRequest, Message, User, IGroup, IActivity
+from .models import Connection, ConnectionRequest, GroupMessage, MentorshipRequest, Message, User, IGroup, IActivity
 
 from django.contrib.auth.hashers import make_password
+
+class UserCourseProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserCourseProgress
+        fields = ['is_unlocked', 'is_completed', 'progress', 'course']
 
 class BasicUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,13 +24,11 @@ class BasicUserSerializer(serializers.ModelSerializer):
             'time_spent_learning',
         ]
 class UserSerializer(serializers.ModelSerializer):
+    courses = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = [
-            'id', 'username', 'name', 'email', 'password', 'avatar', 'interests', 'city', 'jobTitle', 'bio', 'country',
-            'isNetworking', 'website', 'linkedin', 'twitter', 'instagram', 'availabilityStatus', 'activityLevel',
-            'experiencePoints', 'level', 'connectionsCount', 'isMentor', 'expertise', 'mentees', 'role', 'completed_courses_count'
-        ]
+        fields = '__all__'
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate_password(self, value):
@@ -58,11 +62,31 @@ class UserSerializer(serializers.ModelSerializer):
                     'difficulty': 'hard',
                 }
             )
+    
+    def get_courses(self, obj):
+        progress = UserCourseProgress.objects.filter(user=obj).values_list('course', flat=True)
+        return list(progress)
 
 class IGroupSerializer(serializers.ModelSerializer):
+    members = BasicUserSerializer(many=True, read_only=True)
+    members_count = serializers.IntegerField(source='members.count', read_only=True)
+    is_member = serializers.SerializerMethodField()
+
     class Meta:
         model = IGroup
         fields = '__all__'
+
+    def get_is_member(self, obj):
+        user = self.context['request'].user
+        return obj.is_member(user)
+    
+class GroupMessageSerializer(serializers.ModelSerializer):
+    sender = BasicUserSerializer(read_only=True)
+
+    class Meta:
+        model = GroupMessage
+        fields = ['id', 'group', 'sender', 'content', 'sent_at']
+        read_only_fields = ['sender', 'sent_at']
 
 class IActivitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -90,3 +114,11 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ['id', 'sender', 'recipient', 'content', 'sent_at']
+
+class MentorshipRequestSerializer(serializers.ModelSerializer):
+    sender = BasicUserSerializer(read_only=True)
+    mentor = BasicUserSerializer(read_only=True)
+
+    class Meta:
+        model = MentorshipRequest
+        fields = ['id', 'sender', 'mentor', 'status', 'sent_at']

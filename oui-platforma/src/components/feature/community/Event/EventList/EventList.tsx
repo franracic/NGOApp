@@ -1,70 +1,64 @@
-import { IEvent } from "@/typings/course";
-import { VStack } from "@chakra-ui/react";
-import { useState } from "react";
+import { fetcher } from "@/fetchers/fetcher";
+import { newEvent } from "@/fetchers/networking";
+import { swrKeys } from "@/fetchers/swrKeys";
+import { IEvent, IUser } from "@/typings/course";
+import { SimpleGrid, Spinner, Text, useToast, VStack } from "@chakra-ui/react";
+import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
 import { EventDetails } from "../EventDetails/EventDetails";
 import { NewEventForm } from "../NewEventForm/NewEventForm";
 
-export const mockEvents: IEvent[] = [
-  {
-    id: 1,
-    name: "STEAM Education Webinar",
-    date: new Date(),
-    description:
-      "An introductory webinar on integrating STEAM education into the classroom, with a focus on creative approaches.",
-    attendees: 150,
-    level: 7,
-  },
-  {
-    id: 2,
-    name: "Growth Mindset Workshop",
-    date: new Date(),
-    description:
-      "A hands-on workshop focused on developing a growth mindset among students, with practical strategies and activities.",
-    attendees: 80,
-    level: 5,
-  },
-  {
-    id: 3,
-    name: "Experiential Learning Conference",
-    date: new Date(),
-    description:
-      "Join educators and thought leaders to explore the latest trends and best practices in experiential learning.",
-    attendees: 200,
-    level: 8,
-  },
-  {
-    id: 4,
-    name: "Arts Integration in STEAM",
-    date: new Date(),
-    description:
-      "A workshop dedicated to incorporating arts into STEM education to create a holistic STEAM curriculum.",
-    attendees: 120,
-    level: 6,
-  },
-  {
-    id: 5,
-    name: "Project-Based Learning Bootcamp",
-    date: new Date(),
-    description:
-      "An intensive bootcamp where educators can learn to implement project-based learning effectively in their classrooms.",
-    attendees: 60,
-    level: 7,
-  },
-];
-
 export const EventList = () => {
-  const [events, setEvents] = useState<IEvent[]>(mockEvents);
+  const {
+    data: events,
+    error,
+    mutate,
+  } = useSWR(swrKeys.events, fetcher<IEvent[]>);
+  const { data: currentUser } = useSWR(swrKeys.currentUser, fetcher<IUser>);
+  const toast = useToast();
 
-  const addEvent = (newEvent: IEvent) => {
-    setEvents([newEvent, ...events]);
+  const { trigger } = useSWRMutation(
+    swrKeys.events,
+    async (url, { arg: newEventData }: { arg: Partial<IEvent> }) => {
+      await newEvent(newEventData);
+    }
+  );
+
+  if (error) return <Text>Error loading events</Text>;
+  if (!events) return <Spinner />;
+
+  const addEvent = async (newEventData: Partial<IEvent>) => {
+    try {
+      await trigger(newEventData);
+      mutate();
+      toast({
+        title: "Event Created",
+        description: "Your event has been created successfully.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create event.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
     <VStack spacing={8}>
-      <NewEventForm addEvent={addEvent} />
-      {events.map((event) => (
-        <EventDetails key={event.id} event={event} />
-      ))}
+      {(currentUser?.role === "admin" || currentUser?.role === "mentor") && (
+        <NewEventForm addEvent={addEvent} />
+      )}
+      <SimpleGrid columns={[1, 2, 3, 4]} spacing={4} w={"full"}>
+        {events.map((event) => (
+          <EventDetails key={event.id} event={event} />
+        ))}
+      </SimpleGrid>
     </VStack>
   );
 };
