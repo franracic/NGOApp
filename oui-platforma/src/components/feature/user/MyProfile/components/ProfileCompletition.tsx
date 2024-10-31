@@ -1,5 +1,10 @@
 import { IUser } from "@/typings/course";
-import { Box, CircularProgress, Text } from "@chakra-ui/react";
+import {
+  Box,
+  CircularProgress,
+  CircularProgressLabel,
+  Text,
+} from "@chakra-ui/react";
 import React from "react";
 
 interface ProfileCompletionMeterProps {
@@ -9,22 +14,27 @@ interface ProfileCompletionMeterProps {
 export const ProfileCompletionMeter: React.FC<ProfileCompletionMeterProps> = ({
   user,
 }) => {
-  const totalFields = 24;
-  const completedFields = Object.values(user).filter(
-    (value) => value !== ""
-  ).length;
-  const completionPercentage = (completedFields / totalFields) * 100;
+  const experiencePoints = user.experiencePoints || 0;
+  const level = user.level;
+  const experiencePercentage = (experiencePoints / 1000) * 100;
 
   return (
     <Box textAlign="center" mb={4}>
-      <Text fontWeight="bold" mb={2}>
-        Completion until mentor: {Math.round(completionPercentage)}%
-      </Text>
       <CircularProgress
-        value={completionPercentage}
-        size="100px"
+        value={experiencePercentage}
+        size="180px"
         color="yellowDark"
-      />
+        thickness="8px"
+      >
+        <CircularProgressLabel>
+          <Box>
+            <Text fontSize="lg" fontWeight="bold">
+              Level: {level}
+            </Text>
+            <Text fontSize="sm">{experiencePoints}XP</Text>
+          </Box>
+        </CircularProgressLabel>
+      </CircularProgress>
     </Box>
   );
 };

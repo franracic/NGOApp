@@ -64,7 +64,7 @@ const steps = [
     {
       title: "School",
       icon: MdSchool,
-      description: "University ",
+      description: "University",
       type: "text",
     },
   ],

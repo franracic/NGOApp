@@ -1,5 +1,4 @@
-// src/components/user/UserProfile/UserProfile.tsx
-
+"use client";
 import { fetcher } from "@/fetchers/fetcher";
 import { swrKeys } from "@/fetchers/swrKeys";
 import { IUser } from "@/typings/course";

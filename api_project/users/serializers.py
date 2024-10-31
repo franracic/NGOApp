@@ -21,8 +21,9 @@ class BasicUserSerializer(serializers.ModelSerializer):
             'connectionsCount', 'isMentor', 'expertise', 'completed_courses_count',
             'submitted_resources_count', 'connections_count', 'login_streak', 'comment_count',
             'perfect_quizzes_count', 'liked_resources_count', 'viewed_resources_count',
-            'time_spent_learning',
+            'time_spent_learning', 'NGO', 'max_mentees', 'mentor'
         ]
+        
 class UserSerializer(serializers.ModelSerializer):
     courses = serializers.SerializerMethodField()
 

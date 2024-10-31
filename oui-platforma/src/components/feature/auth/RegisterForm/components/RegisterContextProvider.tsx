@@ -27,7 +27,7 @@ export interface IRegisterForm {
   city: string;
   country: string;
   workPlace: string;
-  employer: string;
+  NGO: string;
   role: string;
 }
 
@@ -40,7 +40,10 @@ export const RegisterContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { activeStep, setActiveStep } = useSteps({ index: 0, count: 4 });
+  const { activeStep, setActiveStep: chakraSetActiveStep } = useSteps({
+    index: 0,
+    count: 4,
+  });
   const formMethods = useForm<IRegisterForm>({
     defaultValues: {
       username: [""],
@@ -49,10 +52,18 @@ export const RegisterContextProvider = ({
       city: "",
       country: "",
       workPlace: "",
-      employer: "",
+      NGO: "",
       role: "beginner",
     },
   });
+
+  const setActiveStep: Dispatch<SetStateAction<number>> = (value) => {
+    if (typeof value === "function") {
+      chakraSetActiveStep(value(activeStep));
+    } else {
+      chakraSetActiveStep(value);
+    }
+  };
 
   return (
     <RegisterContext.Provider
@@ -68,7 +79,7 @@ export const RegisterContextProvider = ({
         city: formMethods.watch("city"),
         country: formMethods.watch("country"),
         workPlace: formMethods.watch("workPlace"),
-        employer: formMethods.watch("employer"),
+        NGO: formMethods.watch("NGO"),
         role: formMethods.watch("role"),
         setError: formMethods.setError,
         handleSubmit: formMethods.handleSubmit,

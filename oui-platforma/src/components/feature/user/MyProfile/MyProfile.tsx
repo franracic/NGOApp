@@ -1,28 +1,19 @@
+"use client";
 import { fetcher } from "@/fetchers/fetcher";
 import { swrKeys } from "@/fetchers/swrKeys";
 import { IUser } from "@/typings/course";
-import {
-  Box,
-  Button,
-  Card,
-  Heading,
-  SimpleGrid,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Button, Card, SimpleGrid, useToast } from "@chakra-ui/react";
 import React, { useState } from "react";
 import useSWR from "swr";
 import { ActivityFeed } from "./components/Activity";
 import { AvatarSection } from "./components/AvatarSection";
 import { CroppingModal } from "./components/CroppingModal";
-import { NetworkingStatus } from "./components/NetworkingStatus";
 import { ProfileBio } from "./components/ProfileBio";
-import { ProfileCompletionMeter } from "./components/ProfileCompletition";
 import { ProfileDetails } from "./components/ProfileDetails";
 import { ProfileLinks } from "./components/ProfileLinks";
-import { SocialsCard } from "./components/SocialsCard";
+import { UserProfileCard } from "./components/UserProfileCard";
 
-export const MyProfile: React.FC<{ userId: string }> = ({ userId }) => {
+export const MyProfile = () => {
   const {
     data: user,
     mutate,
@@ -45,27 +36,39 @@ export const MyProfile: React.FC<{ userId: string }> = ({ userId }) => {
     mutate({ ...user, [name]: value }, false);
   };
 
-  const handleToggleNetworkingStatus = async () => {
-    user.isNetworking = !user.isNetworking;
-    mutate({ ...user, isNetworking: user.isNetworking }, false);
-    await fetch(swrKeys.updateUser(user.id), {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(user),
-    });
+  const handleTagAddition = (tag: { id: string; text: string }) => {
+    const updatedInterests = [...(user.interests || []), tag.text];
+    mutate({ ...user, interests: updatedInterests }, false);
+  };
+
+  const handleTagDelete = (i: number) => {
+    const updatedInterests =
+      user.interests?.filter((_, index) => index !== i) || [];
+    mutate({ ...user, interests: updatedInterests }, false);
   };
 
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      await fetch(swrKeys.updateUser(user.id), {
+      const patchedUser = {
+        name: user.name,
+        jobTitle: user.jobTitle,
+        city: user.city,
+        country: user.country,
+        NGO: user.NGO,
+        bio: user.bio,
+        website: user.website,
+        linkedin: user.linkedin,
+        twitter: user.twitter,
+        instagram: user.instagram,
+        interests: user.interests,
+      };
+      await fetcher(swrKeys.updateUser(user.id), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(user),
+        body: JSON.stringify(patchedUser),
       });
       toast({
         title: "Profile updated.",
@@ -113,7 +116,7 @@ export const MyProfile: React.FC<{ userId: string }> = ({ userId }) => {
       const formData = new FormData();
       formData.append("avatar", file);
 
-      await fetch(swrKeys.updateUser(user.id), {
+      await fetcher(swrKeys.updateUser(user.id), {
         method: "PATCH",
         body: formData,
       });
@@ -146,8 +149,9 @@ export const MyProfile: React.FC<{ userId: string }> = ({ userId }) => {
       flexDirection={"column"}
       p={4}
       bg={"transparent"}
+      maxH={"100vh"}
     >
-      <SimpleGrid columns={[1, 2, 3, 4]} spacing="6">
+      <SimpleGrid columns={[1, 2, 3]} spacing="6">
         <Card gap={8} p={4}>
           <AvatarSection
             avatar={user.avatar || ""}
@@ -158,6 +162,8 @@ export const MyProfile: React.FC<{ userId: string }> = ({ userId }) => {
             user={user}
             isEditing={isEditing}
             handleInputChange={handleInputChange}
+            handleTagAddition={handleTagAddition}
+            handleTagDelete={handleTagDelete}
           />
           <ProfileLinks
             user={user}
@@ -170,27 +176,8 @@ export const MyProfile: React.FC<{ userId: string }> = ({ userId }) => {
             handleInputChange={handleInputChange}
           />
         </Card>
-        <Card gap={8} p={4}>
-          <Heading as="h2" size="md">
-            Profile Stats
-          </Heading>
-          <NetworkingStatus
-            isNetworking={user.isNetworking}
-            handleToggleNetworkingStatus={handleToggleNetworkingStatus}
-          />
-          <ProfileCompletionMeter user={user} />
-          <Text fontSize="sm" color="gray.400">
-            Activity Level: {user.activityLevel}
-          </Text>
-          <Text fontSize="sm" color="gray.400">
-            Experience Points: {user.experiencePoints}
-          </Text>
-          <Text fontSize="sm" color="gray.400">
-            Connections Count: {user.connectionsCount}
-          </Text>
-        </Card>
+        <UserProfileCard user={user} />
         <ActivityFeed />
-        <SocialsCard user={user} />
       </SimpleGrid>
       <Button
         onClick={isEditing ? handleSave : toggleEditing}

@@ -5,6 +5,7 @@ import { fetcher } from "@/fetchers/fetcher";
 import { swrKeys } from "@/fetchers/swrKeys";
 import { ICourse } from "@/typings/course";
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 import useSWR from "swr";
 
 export default function Course() {
@@ -15,6 +16,14 @@ export default function Course() {
     fetcher<ICourse>,
     { refreshInterval: 10000 }
   );
+
+  useEffect(() => {
+    if (course?.title) {
+      document.title = `Course - ${course.title}`;
+    } else {
+      document.title = "Course";
+    }
+  }, [course]);
 
   if (courseError) {
     return <div>Failed to load course.</div>;

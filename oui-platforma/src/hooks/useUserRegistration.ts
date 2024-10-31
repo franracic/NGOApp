@@ -1,3 +1,4 @@
+"use client";
 import { swrKeys } from "@/fetchers/swrKeys";
 import axios from "axios";
 import useSWR from "swr";

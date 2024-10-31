@@ -43,6 +43,7 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     
     interests = models.JSONField(null=True, blank=True)
+    NGO = models.CharField(max_length=100, null=True, blank=True)
     city = models.CharField(max_length=100, null=True, blank=True)
     jobTitle = models.CharField(max_length=100, null=True, blank=True)
     bio = models.TextField(null=True, blank=True)
@@ -56,7 +57,7 @@ class User(AbstractUser):
     activityLevel = models.IntegerField(default=0)
     experiencePoints = models.IntegerField(default=0)
     level = models.IntegerField(default=1)
-    connectionsCount = models.IntegerField(null=True, blank=True)
+    connectionsCount = models.IntegerField(default=0)
     isMentor = models.BooleanField(default=False)
     expertise = models.JSONField(null=True, blank=True)
     completed_courses_count = models.IntegerField(default=0)

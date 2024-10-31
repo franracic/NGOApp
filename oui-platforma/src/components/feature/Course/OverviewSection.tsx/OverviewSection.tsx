@@ -22,7 +22,7 @@ export const OverviewSection = ({ course }: { course: ICourse }) => {
     course: parentCourse,
     average_rating,
     description,
-    no_of_reviews,
+    no_of_ratings,
     authors,
     total_duration,
     type,
@@ -63,7 +63,7 @@ export const OverviewSection = ({ course }: { course: ICourse }) => {
       <Flex mt={2} alignItems="center" gap={4}>
         <RatingText
           average_rating={average_rating}
-          no_of_reviews={no_of_reviews}
+          no_of_reviews={no_of_ratings}
         />
         {total_duration && (
           <TotalDurationText total_duration={total_duration} />

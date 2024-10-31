@@ -1,3 +1,4 @@
+"use client";
 import { UserList } from "@/components/feature/user/UserList/UserList";
 import { UserProfile } from "@/components/feature/user/UserProfile/UserProfile";
 import { fetcher } from "@/fetchers/fetcher";

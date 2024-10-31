@@ -18,7 +18,6 @@ export async function fetcher<T>(
       ...init,
       headers,
     });
-    // await new Promise((resolve) => setTimeout(resolve, 10000));
     const response = await fetch(input, {
       ...init,
       headers,

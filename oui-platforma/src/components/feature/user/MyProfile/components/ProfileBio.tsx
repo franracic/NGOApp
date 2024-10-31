@@ -13,7 +13,7 @@ export const ProfileBio: React.FC<ProfileBioProps> = ({
   handleInputChange,
 }) => {
   return (
-    <Box textAlign="center" px={4} maxW="300px">
+    <Box textAlign="center" px={4}>
       {isEditing ? (
         <Textarea
           name="bio"

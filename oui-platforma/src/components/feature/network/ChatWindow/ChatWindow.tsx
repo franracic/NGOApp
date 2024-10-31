@@ -1,3 +1,4 @@
+"use client";
 import { fetcher } from "@/fetchers/fetcher";
 import { useMessages, useSendMessage } from "@/fetchers/networking";
 import { swrKeys } from "@/fetchers/swrKeys";
@@ -321,7 +322,10 @@ export interface MessageBubbleProps {
   isCurrentUser: boolean;
 }
 
-export const MessageBubble = ({ message, isCurrentUser }: MessageBubbleProps) => {
+export const MessageBubble = ({
+  message,
+  isCurrentUser,
+}: MessageBubbleProps) => {
   const sanitizedContent = DOMPurify.sanitize(message.content);
 
   return (

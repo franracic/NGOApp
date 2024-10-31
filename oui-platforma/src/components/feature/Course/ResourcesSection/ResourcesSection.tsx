@@ -13,18 +13,16 @@ interface ResourcesSectionProps {
 export const ResourcesSection: React.FC<ResourcesSectionProps> = ({
   resourceIds,
 }) => {
-  const {
-    data: resources,
-    error,
-    isLoading,
-  } = resourceIds.length > 0
-    ? useSWR(swrKeys.multipleResources, () =>
-        fetcher<IResource[]>(swrKeys.multipleResources, {
-          method: "POST",
-          body: JSON.stringify({ ids: resourceIds }),
-        })
-      )
-    : { data: [], error: false, isLoading: false };
+  const { data, error, isLoading } = useSWR(
+    resourceIds.length > 0 ? swrKeys.multipleResources : null,
+    () =>
+      fetcher<IResource[]>(swrKeys.multipleResources, {
+        method: "POST",
+        body: JSON.stringify({ ids: resourceIds }),
+      })
+  );
+
+  const resources = resourceIds.length > 0 ? data : [];
 
   if (error) return <Text>Error loading resources</Text>;
   if (isLoading) return <Text>Loading...</Text>;

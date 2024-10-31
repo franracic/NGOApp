@@ -1,5 +1,4 @@
-// src/components/mentorship/MentorshipRequests.tsx
-
+"use client";
 import {
   useAcceptMentorshipRequest,
   useMentorshipRequests,

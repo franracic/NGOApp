@@ -75,7 +75,7 @@ export const Dashboard = () => {
           <Box w={{ base: "100%", lg: "30%" }}>
             <VStack spacing={2} align="stretch" h={"full"}>
               <RecommendedActivity user={user} loading={isUserLoading} />
-              <AchievementsNearCompletion user={user} loading={isUserLoading} />
+              <AchievementsNearCompletion />
             </VStack>
           </Box>
         </Flex>

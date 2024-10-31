@@ -19,16 +19,41 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
+import dynamic from "next/dynamic";
 import React, { useState } from "react";
 import useSWR from "swr";
-import { ChatWindow } from "../../network/ChatWindow/ChatWindow";
-import { UserList } from "../../user/UserList/UserList";
-import { UserProfile } from "../../user/UserProfile/UserProfile";
-import { MenteeDashboard } from "../MentorDashboard/MentorDashboard";
-import { MentorshipRequests } from "../MentorshipRequests/MentorshipRequests";
+
+const ChatWindow = dynamic(
+  () =>
+    import("../../network/ChatWindow/ChatWindow").then((mod) => mod.ChatWindow),
+  { ssr: false }
+);
+const UserList = dynamic(
+  () => import("../../user/UserList/UserList").then((mod) => mod.UserList),
+  { ssr: false }
+);
+const UserProfile = dynamic(
+  () =>
+    import("../../user/UserProfile/UserProfile").then((mod) => mod.UserProfile),
+  { ssr: false }
+);
+const MenteeDashboard = dynamic(
+  () =>
+    import("../MentorDashboard/MentorDashboard").then(
+      (mod) => mod.MenteeDashboard
+    ),
+  { ssr: false }
+);
+const MentorshipRequests = dynamic(
+  () =>
+    import(
+      "@/components/feature/mentor/MentorshipRequests/MentorshipRequests"
+    ).then((mod) => mod.MentorshipRequests),
+  { ssr: false }
+);
 
 export const MentorshipSection = () => {
-  const { data: user, isLoading: isUserLoading } = useSWR(
+  const { data: user = null, isLoading: isUserLoading } = useSWR(
     swrKeys.currentUser,
     fetcher<IUser>
   );
@@ -55,12 +80,10 @@ export const MentorshipSection = () => {
 
   const toast = useToast();
 
-  const { data: mentors } = useAvailableMentors(searchQuery, currentPage);
+  const { data: mentors = [] } = useAvailableMentors(searchQuery, currentPage);
   const { trigger: sendMentorshipRequest } = useSendMentorshipRequest();
-
-  const { data: mentees } = useUserMentees();
-
-  const { data: mentor } = useSWR(swrKeys.mentor, fetcher<IUser>);
+  const { data: mentees = [] } = useUserMentees();
+  const { data: mentor = null } = useSWR(swrKeys.mentor, fetcher<IUser>);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -139,7 +162,7 @@ export const MentorshipSection = () => {
               <Text fontSize="3xl" fontWeight="bold" mb={4} textAlign="center">
                 Your Mentees
               </Text>
-              {mentees && mentees.length > 0 ? (
+              {mentees.length > 0 ? (
                 <UserList
                   users={mentees}
                   onClick={handleMenteeClick}
@@ -184,7 +207,7 @@ export const MentorshipSection = () => {
                 </Button>
               </Card>
               <SlideFade in>
-                <UserList users={mentors || []} onClick={handleUserClick} />
+                <UserList users={mentors} onClick={handleUserClick} />
               </SlideFade>
               <Flex justifyContent="center" mt={4}>
                 <Button
@@ -196,7 +219,7 @@ export const MentorshipSection = () => {
                 </Button>
                 <Button
                   onClick={handleNextPage}
-                  disabled={!mentors || mentors.length === 0}
+                  disabled={mentors.length === 0}
                 >
                   Next
                 </Button>

@@ -1,5 +1,3 @@
-// src/fetchers/mentorship.ts
-
 import { IMentorshipRequest, IUser } from "@/typings/course";
 import useSWR from "swr";
 import { fetcher } from "./fetcher";

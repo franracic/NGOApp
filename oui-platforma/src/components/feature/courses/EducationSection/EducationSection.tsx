@@ -1,3 +1,4 @@
+"use client";
 import { Hero } from "@/components/core/Hero/Hero";
 import { fetcher } from "@/fetchers/fetcher";
 import { swrKeys } from "@/fetchers/swrKeys";

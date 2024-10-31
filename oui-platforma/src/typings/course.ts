@@ -67,6 +67,7 @@ export interface IUser {
   country?: string;
   isNetworking?: boolean;
   website?: string;
+  NGO?: string;
   linkedin?: string;
   twitter?: string;
   instagram?: string;

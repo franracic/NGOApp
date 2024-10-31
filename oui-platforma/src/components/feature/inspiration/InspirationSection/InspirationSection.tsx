@@ -63,7 +63,7 @@ export const InspirationSection = () => {
 
         <SimpleGrid columns={[1, 2, 3]} gap={6}>
           {earnedTrophies.map((trophy: ITrophy) => (
-            <TrophyCard {...trophy} />
+            <TrophyCard {...trophy} key={trophy.id} />
           ))}
         </SimpleGrid>
 
@@ -73,7 +73,7 @@ export const InspirationSection = () => {
 
         <SimpleGrid columns={[1, 2, 3]} gap={6}>
           {inProgressTrophies.map((trophy: ITrophy) => (
-            <TrophyCard {...trophy} />
+            <TrophyCard {...trophy} key={trophy.id} />
           ))}
         </SimpleGrid>
         <Heading mt={8} textAlign="center">

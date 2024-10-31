@@ -43,7 +43,11 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if self.action in ['partial_update']:
+            return User.objects.all()
         search_query = self.request.query_params.get('search', '')
+        if not search_query:
+            return User.objects.exclude(id=self.request.user.id)
         return User.objects.filter(
             Q(username__icontains=search_query) |
             Q(jobTitle__icontains=search_query) |

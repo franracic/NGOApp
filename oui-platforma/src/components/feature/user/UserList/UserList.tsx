@@ -1,3 +1,4 @@
+"use client";
 import { IUser } from "@/typings/course";
 import { Box, SimpleGrid } from "@chakra-ui/react";
 import { UserCard } from "../UserCard/UserCard";
