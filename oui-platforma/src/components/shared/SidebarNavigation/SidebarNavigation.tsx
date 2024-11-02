@@ -42,7 +42,8 @@ export const SidebarNavigation = () => {
         base: "none",
         md: "1px solid #e2e8f0",
       }}
-      overflow="auto"
+      overflowY="auto"
+      overflowX={"hidden"}
       display={{
         base: "none",
         md: "flex",

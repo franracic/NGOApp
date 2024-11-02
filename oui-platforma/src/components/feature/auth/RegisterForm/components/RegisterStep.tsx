@@ -20,9 +20,7 @@ import {
   MdFlag,
   MdGroup,
   MdLocationCity,
-  MdLocationOn,
   MdPerson,
-  MdSchool,
   MdWork,
 } from "react-icons/md";
 import { IRegisterForm, RegisterContext } from "./RegisterContextProvider";
@@ -31,7 +29,7 @@ import { RegisterLastStep } from "./RegisterLastStep";
 const steps = [
   [
     {
-      title: "username",
+      title: "name",
       icon: MdPerson,
       description: "full name",
       type: "text",
@@ -44,29 +42,17 @@ const steps = [
     },
   ],
   [
-    {
-      title: "address",
-      icon: MdLocationOn,
-      description: "address",
-      type: "text",
-    },
     { title: "city", icon: MdLocationCity, description: "city", type: "text" },
     { title: "country", icon: MdFlag, description: "country", type: "text" },
   ],
   [
     {
-      title: "workPlace",
+      title: "jobTitle",
       icon: MdWork,
-      description: "work place",
+      description: "job or university",
       type: "text",
     },
     { title: "NGO", icon: MdGroup, description: "NGO", type: "text" },
-    {
-      title: "School",
-      icon: MdSchool,
-      description: "University",
-      type: "text",
-    },
   ],
 ];
 

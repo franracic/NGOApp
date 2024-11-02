@@ -83,7 +83,7 @@ export const ConnectionRequests = ({
               <HStack justifyContent="space-between" w="full" gap={4}>
                 <HStack>
                   <Avatar src={request.sender.avatar} />
-                  <Text fontWeight="bold">{request.sender.username}</Text>
+                  <Text fontWeight="bold">{request.sender.name}</Text>
                 </HStack>
                 <Button
                   variant="link"

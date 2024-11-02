@@ -52,6 +52,7 @@ export const RegisterLastStep = () => {
   };
 
   const onRegister = async (data: IRegisterForm) => {
+    console.log(data);
     if (data.password !== data.confirmPassword) {
       setError("confirmPassword", {
         type: "manual",
@@ -64,7 +65,7 @@ export const RegisterLastStep = () => {
       await registerUser(data);
       toast({
         title: "Account created.",
-        description: "Welcome " + data.username + "!",
+        description: "Welcome " + data.name + "!",
         status: "success",
         duration: 2000,
         isClosable: true,

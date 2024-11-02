@@ -34,7 +34,7 @@ export const MentorCard = ({
       <Box position="relative" width="100%" flexGrow={1}>
         <Image
           src={mentor.avatar || placeholderImage}
-          alt={mentor.username}
+          alt={mentor.name}
           sizes="(max-width: 768px) 25vw"
           h={"220px"}
           w={"100%"}
@@ -46,7 +46,7 @@ export const MentorCard = ({
       <CardBody color="brand.800" flexGrow={0} alignSelf={"center"}>
         <VStack align="start" spacing={2}>
           <Heading size="md" noOfLines={1}>
-            {mentor.username}
+            {mentor.name}
           </Heading>
           <Flex alignItems="center" gap={2}>
             <MdWork />

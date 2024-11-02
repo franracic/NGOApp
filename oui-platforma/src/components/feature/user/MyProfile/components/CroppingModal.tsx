@@ -20,7 +20,7 @@ import { getCroppedImg } from "./Cropping";
 
 interface ICroppingModalProps {
   imageSrc: string | null;
-  setUser: (croppedImage: string) => Promise<void>;
+  setUser: (croppedImage: File) => Promise<void>;
   isCropping: boolean;
   setIsCropping: Dispatch<React.SetStateAction<boolean>>;
 }
@@ -51,8 +51,13 @@ export const CroppingModal = ({
     if (!imageSrc || !croppedAreaPixels) return;
 
     try {
-      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
-      await setUser(croppedImage);
+      const croppedImageBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
+
+      const croppedImageFile = new File([croppedImageBlob], "avatar.jpg", {
+        type: "image/jpeg",
+      });
+
+      await setUser(croppedImageFile);
     } catch (e) {
       console.error(e);
     }

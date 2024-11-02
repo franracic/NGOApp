@@ -85,7 +85,7 @@ export const UserProfile = ({
       <Box position="relative" width="100%" mb={4}>
         <Image
           src={user.avatar || "https://placehold.co/400x600?text=No+Avatar"}
-          alt={user.username}
+          alt={user.name}
           h="220px"
           w="100%"
           objectFit="cover"

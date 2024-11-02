@@ -21,14 +21,13 @@ export interface IRegisterForm {
   email: string;
   password: string;
   confirmPassword: string;
-  username: string[];
   dateOfBirth: Date;
-  address: string;
   city: string;
   country: string;
-  workPlace: string;
+  jobTitle: string;
   NGO: string;
   role: string;
+  name: string;
 }
 
 export const RegisterContext = createContext<IRegisterContext>(
@@ -46,12 +45,11 @@ export const RegisterContextProvider = ({
   });
   const formMethods = useForm<IRegisterForm>({
     defaultValues: {
-      username: [""],
+      name: "",
       dateOfBirth: new Date(),
-      address: "",
       city: "",
       country: "",
-      workPlace: "",
+      jobTitle: "",
       NGO: "",
       role: "beginner",
     },
@@ -73,12 +71,11 @@ export const RegisterContextProvider = ({
         email: formMethods.watch("email"),
         password: formMethods.watch("password"),
         confirmPassword: formMethods.watch("confirmPassword"),
-        username: formMethods.watch("username"),
         dateOfBirth: formMethods.watch("dateOfBirth"),
-        address: formMethods.watch("address"),
         city: formMethods.watch("city"),
         country: formMethods.watch("country"),
-        workPlace: formMethods.watch("workPlace"),
+        jobTitle: formMethods.watch("jobTitle"),
+        name: formMethods.watch("name"),
         NGO: formMethods.watch("NGO"),
         role: formMethods.watch("role"),
         setError: formMethods.setError,

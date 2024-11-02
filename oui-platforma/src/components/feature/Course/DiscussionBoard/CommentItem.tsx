@@ -216,10 +216,10 @@ export const CommentItem: React.FC<CommentItemProps> = ({
       bg="gray.50"
     >
       <HStack align="start">
-        <Avatar name={comment.user.username} src={comment.user.avatar} />
+        <Avatar name={comment.user.name} src={comment.user.avatar} />
         <Box flex="1">
           <HStack justify="space-between" w="full">
-            <Text fontWeight="bold">{comment.user.username}</Text>
+            <Text fontWeight="bold">{comment.user.name}</Text>
             <Text fontSize="sm" color="gray.500">
               {new Date(comment.timestamp).toLocaleString()}
             </Text>
@@ -311,13 +311,13 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 <Box key={reply.id} p={2} bg={"gray.100"} borderRadius="md">
                   <HStack align="start">
                     <Avatar
-                      name={reply.user.username}
+                      name={reply.user.name}
                       src={reply.user.avatar}
                       size="sm"
                     />
                     <Box flex="1">
                       <HStack justify="space-between" w="full">
-                        <Text fontWeight="bold">{reply.user.username}</Text>
+                        <Text fontWeight="bold">{reply.user.name}</Text>
                         <Text fontSize="sm" color="gray.500">
                           {new Date(reply.timestamp).toLocaleString()}
                         </Text>

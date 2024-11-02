@@ -101,20 +101,16 @@ export default function MyProfile() {
     }
   };
 
-  const handleSaveCroppedImage = async (croppedImage: string) => {
+  const handleSaveCroppedImage = async (croppedImage: File) => {
     try {
-      const blob = await (await fetch(croppedImage)).blob();
-      const file = new File([blob], "avatar.jpg", { type: blob.type });
-
       const formData = new FormData();
-      formData.append("avatar", file);
-
+      formData.append("avatar", croppedImage);
       await fetcher(swrKeys.updateUser(user.id), {
         method: "PATCH",
         body: formData,
       });
 
-      mutate({ ...user, avatar: URL.createObjectURL(file) }, false);
+      mutate({ ...user, avatar: URL.createObjectURL(croppedImage) }, false);
 
       toast({
         title: "Avatar updated.",

@@ -8,12 +8,15 @@ export async function fetcher<T>(
     const authHeader = authHeaderString ? JSON.parse(authHeaderString) : null;
 
     const headers = {
-      "Content-Type": "application/json",
       ...init?.headers,
       origin: "http://localhost:3000",
       uid: authHeader.uid || "",
       Authorization: "Bearer " + authHeader.access || "",
-    };
+    } as any;
+    if (!(init?.body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
+
     console.log({
       ...init,
       headers,

@@ -33,7 +33,7 @@ export const DiscussionDetails = () => {
           {discussion.title}
         </Heading>
         <Text fontSize="sm" color="gray.500" mb={4}>
-          By {discussion.author.username} on{" "}
+          By {discussion.author.name} on{" "}
           {new Date(discussion.timestamp).toLocaleString()}
         </Text>
         <Divider mb={4} />

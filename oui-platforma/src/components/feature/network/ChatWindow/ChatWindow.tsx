@@ -300,10 +300,10 @@ export const MessageGroup = ({ group, isCurrentUser }: MessageGroupProps) => {
           <Avatar
             size="sm"
             src={group.sender.avatar || ""}
-            name={group.sender.username}
+            name={group.sender.name}
             mr={2}
           />
-          <Text fontWeight="bold">{group.sender.username}</Text>
+          <Text fontWeight="bold">{group.sender.name}</Text>
         </Flex>
       )}
       {group.messages.map((msg) => (

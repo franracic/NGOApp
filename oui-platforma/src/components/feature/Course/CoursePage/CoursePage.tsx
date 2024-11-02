@@ -22,12 +22,13 @@ export const CoursePage: React.FC<CoursePageProps> = ({
   const [selectedContent, setSelectedContent] = useState<ICourseContent | null>(
     null
   );
+  const [found, setFound] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<number>(0);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isContentCompleted, setIsContentCompleted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (course && course.sections) {
+    if (course && course.sections && !found) {
       const firstIncompleteContent = course.sections
         .flatMap((section) => section.contents)
         .find((content) => !content.is_completed);
@@ -35,6 +36,7 @@ export const CoursePage: React.FC<CoursePageProps> = ({
         firstIncompleteContent || course.sections[0].contents[0] || null
       );
       setIsContentCompleted(false);
+      setFound(true);
     }
   }, [course]);
 

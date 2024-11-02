@@ -5,7 +5,7 @@ import React, { useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 
 interface MarkdownTextComponentProps {
-  content: string;
+  description: string;
   fontSize?: string | number;
   color?: string;
   fontWeight?: string | number;
@@ -14,7 +14,7 @@ interface MarkdownTextComponentProps {
 }
 
 export const MarkdownTextComponent: React.FC<MarkdownTextComponentProps> = ({
-  content,
+  description,
   fontSize = "md",
   color = "black",
   fontWeight = "normal",
@@ -51,7 +51,7 @@ export const MarkdownTextComponent: React.FC<MarkdownTextComponentProps> = ({
           ),
         }}
       >
-        {content}
+        {description}
       </ReactMarkdown>
     </Box>
   );

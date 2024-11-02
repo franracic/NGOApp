@@ -8,7 +8,7 @@ export const MentorSearch = ({ mentors }: { mentors: IUser[] }) => {
 
   const filteredMentors = mentors.filter(
     (mentor) =>
-      mentor.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      mentor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       mentor.expertise?.some((exp) =>
         exp.toLowerCase().includes(searchQuery.toLowerCase())
       )

@@ -90,7 +90,7 @@ export const CourseCard = ({
             >
               {!is_unlocked ? (
                 <>
-                  <LockIcon boxSize={20} />
+                  <LockIcon boxSize={8} />
                   <Text>Locked</Text>
                 </>
               ) : is_completed ? (

@@ -31,7 +31,7 @@ export const CompactMentorMenteesOverview = ({ mentor }: { mentor: IUser }) => {
           mentor.mentees.slice(0, 2).map((mentee) => (
             <Link key={mentee.id} href={`/users/${mentee.id}`} isExternal>
               <Text fontSize="sm" color={textSecondary} isTruncated>
-                {mentee.username}
+                {mentee.name}
               </Text>
             </Link>
           ))

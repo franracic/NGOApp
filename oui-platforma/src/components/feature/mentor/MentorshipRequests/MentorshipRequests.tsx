@@ -82,7 +82,7 @@ export const MentorshipRequests = ({
               <HStack justifyContent="space-between" w="full">
                 <HStack>
                   <Avatar src={request.sender.avatar} />
-                  <Text fontWeight="bold">{request.sender.username}</Text>
+                  <Text fontWeight="bold">{request.sender.name}</Text>
                 </HStack>
                 <Button
                   variant="link"

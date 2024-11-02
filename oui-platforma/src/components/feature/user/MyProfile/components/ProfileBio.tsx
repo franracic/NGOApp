@@ -21,6 +21,7 @@ export const ProfileBio: React.FC<ProfileBioProps> = ({
           onChange={handleInputChange}
           size="sm"
           resize="vertical"
+          placeholder="Tell us about yourself"
         />
       ) : (
         <Text>{bio}</Text>
