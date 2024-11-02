@@ -22,15 +22,7 @@ import { ProfileCompletionMeter } from "./ProfileCompletition";
 
 export const UserProfileCard: React.FC<{ user: IUser }> = ({ user }) => {
   return (
-    <Card
-      gap={8}
-      p={4}
-      borderRadius="md"
-      boxShadow="md"
-      border="1px solid"
-      borderColor="gray.200"
-      maxH={"100vh"}
-    >
+    <Card gap={8} p={4} maxH={"90vh"}>
       <Heading as="h2" size="md" mb={2}>
         Profile Stats
       </Heading>

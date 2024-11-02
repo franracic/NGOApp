@@ -1,4 +1,4 @@
-// src/components/user/UserCard.tsx
+"use client";
 
 import { IUser } from "@/typings/course";
 import {
@@ -11,6 +11,7 @@ import {
   Heading,
   Icon,
   Image,
+  Progress,
   Stack,
   Tag,
   Text,
@@ -58,7 +59,7 @@ export const UserCard = ({
     >
       <Box position="relative" width="100%">
         <Image
-          src={user.avatar || "https://placehold.co/400x600"}
+          src={user.avatar || "https://placehold.co/400x600?text=No+Avatar"}
           alt={user.username}
           h="220px"
           w="100%"
@@ -75,37 +76,61 @@ export const UserCard = ({
               {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
             </Badge>
           </Flex>
-          <Text fontSize="sm" color="gray.600" noOfLines={2}>
-            {user.bio || "No bio available."}
-          </Text>
-          <Flex alignItems="center" gap={2}>
-            <Icon as={MdWork} />
-            <Text fontSize="sm">{user.jobTitle || "Professional"}</Text>
-          </Flex>
-          <Flex alignItems="center" gap={2}>
-            <Icon as={MdLocationCity} />
-            <Text fontSize="sm">
-              {user.city || "City"}, {user.country || "Country"}
+
+          {user.jobTitle && (
+            <Flex alignItems="center" gap={2}>
+              <Icon as={MdWork} />
+              <Text fontSize="sm">{user.jobTitle}</Text>
+            </Flex>
+          )}
+          {(user.city || user.country) && (
+            <Flex alignItems="center" gap={2}>
+              <Icon as={MdLocationCity} />
+              <Text fontSize="sm">
+                {user.city}
+                {user.city && user.country ? ", " : ""}
+                {user.country}
+              </Text>
+            </Flex>
+          )}
+
+          {user.interests && user.interests.length > 0 && (
+            <Flex alignItems="center" gap={2} wrap="wrap">
+              <Icon as={MdInterests} />
+              {user.interests.slice(0, 3).map((interest) => (
+                <Tag
+                  key={interest}
+                  size="sm"
+                  colorScheme="blue"
+                  borderRadius="full"
+                >
+                  {interest}
+                </Tag>
+              ))}
+              {user.interests.length > 3 && (
+                <Tag size="sm" colorScheme="blue" borderRadius="full">
+                  +{user.interests.length - 3}
+                </Tag>
+              )}
+            </Flex>
+          )}
+
+          <Stack spacing={1}>
+            <Text fontSize="sm" color="gray.600">
+              Level: {user.level}
             </Text>
-          </Flex>
-          <Flex alignItems="center" gap={2} wrap="wrap">
-            <Icon as={MdInterests} />
-            {user.interests?.slice(0, 3).map((interest) => (
-              <Tag
-                key={interest}
-                size="sm"
-                colorScheme="blue"
-                borderRadius="full"
-              >
-                {interest}
-              </Tag>
-            ))}
-            {user.interests && user.interests.length > 3 && (
-              <Tag size="sm" colorScheme="blue" borderRadius="full">
-                +{user.interests.length - 3}
-              </Tag>
-            )}
-          </Flex>
+            <Progress
+              colorScheme="yellow"
+              size="sm"
+              value={(user.level / 10) * 100}
+            />
+          </Stack>
+          {user.NGO && (
+            <Badge fontSize="sm" w={"fit-content"} bgColor={"yellowDark"}>
+              NGO: {user.NGO}
+            </Badge>
+          )}
+
           <Button variant="outline" size="sm">
             View Profile
           </Button>

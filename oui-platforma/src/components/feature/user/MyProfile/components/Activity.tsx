@@ -22,7 +22,7 @@ export const ActivityFeed = () => {
   const recentActivities = activities.slice(0, 15);
 
   return (
-    <Card p={4} overflow={"auto"} maxH={"100vh"}>
+    <Card p={4} overflow={"auto"} maxH={"90vh"}>
       <Heading as="h2" size="md" mb={2}>
         Recent Activity
       </Heading>

@@ -10,6 +10,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import React from "react";
+import { IconType } from "react-icons";
 
 interface ShortenedTrophyCardProps {
   title: string;
@@ -26,6 +27,10 @@ export const ShortenedTrophyCard: React.FC<ShortenedTrophyCardProps> = ({
 }) => {
   const bgColor = useColorModeValue("white", "gray.700");
   const textColor = useColorModeValue("gray.800", "white");
+
+  const IconComponent = require("react-icons/fa")[
+    icon as keyof typeof import("react-icons/fa")
+  ] as IconType;
 
   return (
     <Tooltip label={description} fontSize="md" placement="top" hasArrow>
@@ -50,7 +55,7 @@ export const ShortenedTrophyCard: React.FC<ShortenedTrophyCardProps> = ({
             >
               <CircularProgressLabel>
                 <Icon
-                  as={icon}
+                  as={IconComponent}
                   boxSize={6}
                   color={progress >= 100 ? "green.400" : "yellow.500"}
                 />

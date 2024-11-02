@@ -96,7 +96,7 @@ export const CourseCard = ({
               ) : is_completed ? (
                 <Tooltip label="Completed">
                   <Box textAlign="center">
-                    <CheckCircleIcon boxSize={"100px"} color="yellowDark" />
+                    <CheckCircleIcon boxSize={"100px"} color="white" />
                   </Box>
                 </Tooltip>
               ) : (

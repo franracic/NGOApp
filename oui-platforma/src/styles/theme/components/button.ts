@@ -37,6 +37,7 @@ export const Button = defineStyleConfig({
       color: "grayBase",
       fontSize: "16px",
       marginY: "8px",
+      textDecor: "none",
       _hover: {
         color: "black",
       },

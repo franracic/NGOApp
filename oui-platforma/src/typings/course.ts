@@ -74,7 +74,7 @@ export interface IUser {
   availabilityStatus?: string;
   activityLevel?: number;
   experiencePoints?: number;
-  level?: number;
+  level: number;
   connectionsCount?: number;
   isMentor?: boolean;
   expertise?: string[];

@@ -11,6 +11,7 @@ import {
   SkeletonText,
   Text,
 } from "@chakra-ui/react";
+import NextLink from "next/link";
 import { MdLibraryBooks } from "react-icons/md";
 import useSWR from "swr";
 import { ShortenedTrophyCard } from "./AchievementTooltip";
@@ -31,7 +32,7 @@ export const AchievementsNearCompletion = () => {
   const achievementsNearCompletion = trophies
     .filter((trophy) => !trophy.is_earned)
     .sort((a, b) => b.progress - a.progress)
-    .slice(0, 2);
+    .slice(0, 5);
 
   return (
     <Box
@@ -41,7 +42,9 @@ export const AchievementsNearCompletion = () => {
       shadow="lg"
       rounded="2xl"
       w="full"
-      h="full"
+      maxH={"50%"}
+      as={NextLink}
+      href={"/inspiration"}
     >
       <Flex align="center" justify="space-between" px={4} pt={6} pb={2}>
         <Flex align="start">

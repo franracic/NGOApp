@@ -1,142 +1,110 @@
 "use client";
 
-import { IUser } from "@/typings/course";
+import { useNotifications } from "@/fetchers/notification";
 import {
+  Badge,
   Box,
   Flex,
+  HStack,
+  List,
+  ListIcon,
+  ListItem,
   Skeleton,
   SkeletonText,
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { MdEvent } from "react-icons/md";
+import { formatDistanceToNow } from "date-fns";
+import { FaCheckCircle } from "react-icons/fa";
 
-interface IActivity {
-  level: number;
-  title: string;
-  description: string;
-}
-
-const activityList: IActivity[] = [
-  {
-    level: 1,
-    title: "Introduction to Coding",
-    description: "Beginner coding workshop",
-  },
-  {
-    level: 2,
-    title: "STEAM Education Basics",
-    description: "Learn STEAM fundamentals",
-  },
-  {
-    level: 3,
-    title: "Growth Mindset Activities",
-    description: "Hands-on activities for growth mindset",
-  },
-  {
-    level: 4,
-    title: "Robotics 101",
-    description: "Introduction to building simple robots",
-  },
-  {
-    level: 5,
-    title: "Intermediate Python Programming",
-    description: "Advance your Python skills",
-  },
-  {
-    level: 6,
-    title: "Project-Based Learning Bootcamp",
-    description: "Intensive bootcamp for project-based learning",
-  },
-  {
-    level: 7,
-    title: "Advanced Robotics",
-    description: "Building advanced robotics projects",
-  },
-  {
-    level: 8,
-    title: "Experiential Learning Conference",
-    description: "Join experiential learning sessions",
-  },
-  {
-    level: 9,
-    title: "STEAM Leadership Program",
-    description: "Lead STEAM initiatives in your community",
-  },
-  {
-    level: 0,
-    title: "Tech Community Hackathon",
-    description: "Collaborate in a 48-hour hackathon",
-  },
-];
-interface RecommendedActivityProps {
-  user?: IUser;
+interface ActivityFeedProps {
   loading: boolean;
 }
 
-export const RecommendedActivity = ({
-  user,
-  loading,
-}: RecommendedActivityProps) => {
-  const textColor = "gray.800";
-  const cardBg = "white";
-  const textSecondary = "gray.400";
-
-  const recommendedActivities = activityList.filter(
-    (activity) => activity.level <= (user?.level ?? 0)
-  );
+export const RecommendedActivity = ({ loading }: ActivityFeedProps) => {
+  const { data: activities } = useNotifications();
 
   return (
     <Box
       position="relative"
       overflow="hidden"
-      bg={cardBg}
+      bg="white"
       shadow="lg"
       rounded="2xl"
       w="full"
       h="full"
+      maxH={"50%"}
     >
       <Flex align="center" justify="space-between" px={4} py={4}>
         <Flex align="start">
           <Skeleton isLoaded={!loading}>
             <Box position="relative" p={3} bg="yellow.100" rounded="full">
-              <MdEvent size="16px" />
+              <FaCheckCircle size="16px" color="green.500" />
             </Box>
           </Skeleton>
           <Box ml={2}>
             <SkeletonText isLoaded={!loading} noOfLines={1}>
-              <Text fontSize="md" fontWeight="bold" color={textColor}>
-                Recommended Activities
+              <Text fontSize="md" fontWeight="bold" color="gray.800">
+                Recent Activity
               </Text>
             </SkeletonText>
             <SkeletonText isLoaded={!loading} noOfLines={1}>
-              <Text fontSize="xs" color={textSecondary}>
-                Join upcoming events and activities
+              <Text fontSize="xs" color="gray.400">
+                Check out your latest notifications
               </Text>
             </SkeletonText>
           </Box>
         </Flex>
       </Flex>
-      <VStack align="start" px={4} py={2} spacing={2}>
+      <Box px={4} py={2} overflowY="auto" maxH="300px">
         {loading ? (
           <>
-            <SkeletonText noOfLines={2} spacing="4" />
-            <SkeletonText noOfLines={2} spacing="4" />
+            <SkeletonText noOfLines={2} spacing="4" mb={2} />
+            <SkeletonText noOfLines={2} spacing="4" mb={2} />
             <SkeletonText noOfLines={2} spacing="4" />
           </>
+        ) : activities && activities.length > 0 ? (
+          <List spacing={4}>
+            {activities.slice(0, 5).map((activity, index) => (
+              <ListItem key={index}>
+                <HStack justify="space-between" align="start">
+                  <HStack align="start">
+                    <ListIcon as={FaCheckCircle} color="green.500" mt={1} />
+                    <VStack align="start" spacing={0}>
+                      <Text
+                        fontSize="sm"
+                        fontWeight="semibold"
+                        color="gray.800"
+                      >
+                        {activity.message}
+                      </Text>
+                      <Text fontSize="xs" color="gray.500">
+                        {activity.sender_username
+                          ? `From: ${activity.sender_username}`
+                          : "System Notification"}
+                      </Text>
+                    </VStack>
+                  </HStack>
+                  <VStack align="end" spacing={0}>
+                    <Badge colorScheme={activity.is_read ? "gray" : "green"}>
+                      {activity.is_read ? "Read" : "Unread"}
+                    </Badge>
+                    <Text fontSize="xs" color="gray.400">
+                      {formatDistanceToNow(new Date(activity.created_at), {
+                        addSuffix: true,
+                      })}
+                    </Text>
+                  </VStack>
+                </HStack>
+              </ListItem>
+            ))}
+          </List>
         ) : (
-          recommendedActivities.slice(0, 3).map((activity, index) => (
-            <Box key={index}>
-              <Text fontSize="sm" fontWeight="semibold" color={textColor}>
-                {activity.title}
-              </Text>
-              <Text fontSize="xs" color={textSecondary}>
-                {activity.description}
-              </Text>
-            </Box>
-          ))
+          <Text fontSize="sm" color="gray.500">
+            No recent activities found
+          </Text>
         )}
-      </VStack>
+      </Box>
     </Box>
   );
 };

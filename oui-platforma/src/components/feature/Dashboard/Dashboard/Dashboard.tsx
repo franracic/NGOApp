@@ -64,7 +64,12 @@ export const Dashboard = () => {
             </AlertDescription>
           </Alert>
         )}
-        <Flex direction={{ base: "column", lg: "row" }} gap={6} w="full">
+        <Flex
+          direction={{ base: "column", lg: "row" }}
+          gap={6}
+          w="full"
+          h={"full"}
+        >
           <Box w={{ base: "100%", lg: "70%" }}>
             <CourseList
               courses={unCompletedCourses}
@@ -73,8 +78,8 @@ export const Dashboard = () => {
             />
           </Box>
           <Box w={{ base: "100%", lg: "30%" }}>
-            <VStack spacing={2} align="stretch" h={"full"}>
-              <RecommendedActivity user={user} loading={isUserLoading} />
+            <VStack spacing={2} align="stretch" h={"65vh"}>
+              <RecommendedActivity loading={isUserLoading} />
               <AchievementsNearCompletion />
             </VStack>
           </Box>

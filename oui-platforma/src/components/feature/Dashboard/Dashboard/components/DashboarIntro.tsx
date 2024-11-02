@@ -12,7 +12,7 @@ import {
   SkeletonText,
   Text,
 } from "@chakra-ui/react";
-import { MdEvent, MdLibraryBooks, MdPeople, MdSchool } from "react-icons/md";
+import { MdComment, MdLibraryBooks, MdPeople, MdSchool } from "react-icons/md";
 
 interface DashboardIntroProps {
   user: IUser;
@@ -104,118 +104,7 @@ export const DashboardIntro = ({
 
         <Box w="full">
           <Skeleton isLoaded={!loading} borderRadius="2xl">
-            <Box
-              position="relative"
-              overflow="hidden"
-              px={4}
-              py={6}
-              bg={cardBg}
-              shadow="lg"
-              rounded="2xl"
-            >
-              <Text fontSize="20px" fontWeight="bold" color={textColor}>
-                {user.completed_courses_count || "No courses"}
-              </Text>
-              <Text
-                fontSize="smaller"
-                color={textSecondary}
-                whiteSpace="nowrap"
-                overflow="hidden"
-                textOverflow="ellipsis"
-              >
-                Completed Courses
-              </Text>
-              <Box
-                position="absolute"
-                p={2}
-                bg={cardIconBg}
-                rounded="full"
-                top={2}
-                right={4}
-              >
-                <MdSchool size="16px" />
-              </Box>
-            </Box>
-          </Skeleton>
-        </Box>
-
-        <Box w="full" display={{ base: "none", md: "block" }}>
-          <Skeleton isLoaded={!loading} borderRadius="2xl">
-            <Box
-              position="relative"
-              overflow="hidden"
-              px={4}
-              py={6}
-              bg={cardBg}
-              shadow="lg"
-              rounded="2xl"
-            >
-              <Text fontSize="20px" fontWeight="bold" color={textColor}>
-                {user.connectionsCount || "No connections"}
-              </Text>
-              <Text
-                fontSize="smaller"
-                color={textSecondary}
-                whiteSpace="nowrap"
-                overflow="hidden"
-                textOverflow="ellipsis"
-              >
-                Connected Peers
-              </Text>
-              <Box
-                position="absolute"
-                p={2}
-                bg={cardIconBg}
-                rounded="full"
-                top={2}
-                right={4}
-              >
-                <MdPeople size="16px" />
-              </Box>
-            </Box>
-          </Skeleton>
-        </Box>
-
-        <Box w="full">
-          <Skeleton isLoaded={!loading} borderRadius="2xl">
-            <Box
-              position="relative"
-              overflow="hidden"
-              px={4}
-              py={6}
-              bg={cardBg}
-              shadow="lg"
-              rounded="2xl"
-            >
-              <Text fontSize="20px" fontWeight="bold" color={textColor}>
-                3
-              </Text>
-              <Text
-                fontSize="smaller"
-                color={textSecondary}
-                whiteSpace="nowrap"
-                overflow="hidden"
-                textOverflow="ellipsis"
-              >
-                Recommended Resources
-              </Text>
-              <Box
-                position="absolute"
-                p={2}
-                bg={cardIconBg}
-                rounded="full"
-                top={2}
-                right={4}
-              >
-                <MdLibraryBooks size="16px" />
-              </Box>
-            </Box>
-          </Skeleton>
-        </Box>
-
-        {user.isMentor && user.mentees && user.mentees.length > 0 && (
-          <Box w="full">
-            <Skeleton isLoaded={!loading} borderRadius="2xl">
+            <Link href={"/education"}>
               <Box
                 position="relative"
                 overflow="hidden"
@@ -226,7 +115,7 @@ export const DashboardIntro = ({
                 rounded="2xl"
               >
                 <Text fontSize="20px" fontWeight="bold" color={textColor}>
-                  {user.mentees.length}
+                  {user.completed_courses_count || "No courses"}
                 </Text>
                 <Text
                   fontSize="smaller"
@@ -235,7 +124,46 @@ export const DashboardIntro = ({
                   overflow="hidden"
                   textOverflow="ellipsis"
                 >
-                  Mentees
+                  Completed Courses
+                </Text>
+                <Box
+                  position="absolute"
+                  p={2}
+                  bg={cardIconBg}
+                  rounded="full"
+                  top={2}
+                  right={4}
+                >
+                  <MdSchool size="16px" />
+                </Box>
+              </Box>
+            </Link>
+          </Skeleton>
+        </Box>
+
+        <Box w="full" display={{ base: "none", md: "block" }}>
+          <Skeleton isLoaded={!loading} borderRadius="2xl">
+            <Link href={"/peer-to-peer"}>
+              <Box
+                position="relative"
+                overflow="hidden"
+                px={4}
+                py={6}
+                bg={cardBg}
+                shadow="lg"
+                rounded="2xl"
+              >
+                <Text fontSize="20px" fontWeight="bold" color={textColor}>
+                  {user.connectionsCount || "No connections"}
+                </Text>
+                <Text
+                  fontSize="smaller"
+                  color={textSecondary}
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                >
+                  Connected Peers
                 </Text>
                 <Box
                   position="absolute"
@@ -248,46 +176,128 @@ export const DashboardIntro = ({
                   <MdPeople size="16px" />
                 </Box>
               </Box>
-            </Skeleton>
-          </Box>
-        )}
+            </Link>
+          </Skeleton>
+        </Box>
 
         <Box w="full">
           <Skeleton isLoaded={!loading} borderRadius="2xl">
-            <Box
-              position="relative"
-              overflow="hidden"
-              px={4}
-              py={6}
-              bg={cardBg}
-              shadow="lg"
-              rounded="2xl"
-            >
-              <Text fontSize="20px" fontWeight="bold" color={textColor}>
-                {user.events ? user.events.length : "No events"}
-              </Text>
-              <Text
-                fontSize="smaller"
-                color={textSecondary}
-                whiteSpace="nowrap"
-                overflow="hidden"
-                textOverflow="ellipsis"
-              >
-                Upcoming Events
-              </Text>
+            <Link href={"/materials"}>
               <Box
-                position="absolute"
-                p={2}
-                bg={cardIconBg}
-                rounded="full"
-                top={2}
-                right={4}
+                position="relative"
+                overflow="hidden"
+                px={4}
+                py={6}
+                bg={cardBg}
+                shadow="lg"
+                rounded="2xl"
               >
-                <MdEvent size="16px" />
+                <Text fontSize="20px" fontWeight="bold" color={textColor}>
+                  {user.submitted_resources_count || 0}
+                </Text>
+                <Text
+                  fontSize="smaller"
+                  color={textSecondary}
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                >
+                  Resources Shared
+                </Text>
+                <Box
+                  position="absolute"
+                  p={2}
+                  bg={cardIconBg}
+                  rounded="full"
+                  top={2}
+                  right={4}
+                >
+                  <MdLibraryBooks size="16px" />
+                </Box>
               </Box>
-            </Box>
+            </Link>
           </Skeleton>
         </Box>
+
+        {user.mentees && user.mentees.length > 0 ? (
+          <Box w="full">
+            <Skeleton isLoaded={!loading} borderRadius="2xl">
+              <Link href={"/mentorship"}>
+                <Box
+                  position="relative"
+                  overflow="hidden"
+                  px={4}
+                  py={6}
+                  bg={cardBg}
+                  shadow="lg"
+                  rounded="2xl"
+                >
+                  <Text fontSize="20px" fontWeight="bold" color={textColor}>
+                    {user.mentees.length}
+                  </Text>
+                  <Text
+                    fontSize="smaller"
+                    color={textSecondary}
+                    whiteSpace="nowrap"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
+                  >
+                    Mentees
+                  </Text>
+                  <Box
+                    position="absolute"
+                    p={2}
+                    bg={cardIconBg}
+                    rounded="full"
+                    top={2}
+                    right={4}
+                  >
+                    <MdPeople size="16px" />
+                  </Box>
+                </Box>
+              </Link>
+            </Skeleton>
+          </Box>
+        ) : (
+          <Box w="full">
+            <Skeleton isLoaded={!loading} borderRadius="2xl">
+              <Link href={"/networking"}>
+                <Box
+                  position="relative"
+                  overflow="hidden"
+                  px={4}
+                  py={6}
+                  bg={cardBg}
+                  shadow="lg"
+                  rounded="2xl"
+                >
+                  <Text fontSize="20px" fontWeight="bold" color={textColor}>
+                    {user.comment_count ? user.comment_count : "No comments"}
+                  </Text>
+                  <Text
+                    fontSize="smaller"
+                    color={textSecondary}
+                    whiteSpace="nowrap"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
+                  >
+                    Comments Made
+                  </Text>
+                  <Box
+                    position="absolute"
+                    p={2}
+                    bg={cardIconBg}
+                    rounded="full"
+                    top={2}
+                    right={4}
+                  >
+                    <MdComment size="16px" />
+                  </Box>
+                </Box>
+              </Link>
+            </Skeleton>
+          </Box>
+        )}
       </SimpleGrid>
     </Box>
   );

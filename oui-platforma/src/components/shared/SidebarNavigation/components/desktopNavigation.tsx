@@ -16,12 +16,7 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  MdAccountCircle,
-  MdExitToApp,
-  MdHelp,
-  MdQuestionAnswer,
-} from "react-icons/md";
+import { MdAccountCircle, MdContactPage, MdExitToApp } from "react-icons/md";
 import useSWR, { mutate } from "swr";
 import { NavigationMenu } from "./NavigationMenu";
 
@@ -59,13 +54,9 @@ export const ProfileMenu = () => {
         </MenuGroup>
         <MenuDivider />
         <MenuGroup title="Help">
-          <MenuItem>
-            <MdHelp />
-            <Text ml={2}>Docs</Text>
-          </MenuItem>
-          <MenuItem>
-            <MdQuestionAnswer />
-            <Text ml={2}>FAQ</Text>
+          <MenuItem as={NextLink} href="/creator">
+            <MdContactPage />
+            <Text ml={2}>Created By</Text>
           </MenuItem>
         </MenuGroup>
       </MenuList>

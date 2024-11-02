@@ -142,7 +142,7 @@ export default function MyProfile() {
       flexDirection={"column"}
       p={4}
       bg={"transparent"}
-      maxH={"90vh"}
+      maxH={"100vh"}
     >
       <SimpleGrid columns={[1, 2, 3]} gap="6">
         <Card gap={8} p={4}>
