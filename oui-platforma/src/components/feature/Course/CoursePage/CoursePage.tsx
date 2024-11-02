@@ -38,7 +38,7 @@ export const CoursePage: React.FC<CoursePageProps> = ({
       setIsContentCompleted(false);
       setFound(true);
     }
-  }, [course]);
+  }, [course, found]);
 
   const { trigger: triggerCompleteContent } = useSWRMutation(
     swrKeys.completeContent(selectedContent?.id || -1),
