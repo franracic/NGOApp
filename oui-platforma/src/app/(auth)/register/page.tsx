@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "Sign up to access exclusive features and your personalized dashboard.",
 };
 
-export default function Register() {
+export default function Page() {
   return (
     <Container maxHeight="100%" alignContent={"center"}>
       <RegisterForm />

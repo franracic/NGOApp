@@ -1,4 +1,4 @@
-import { EducationSection } from "@/components/feature/courses/EducationSection/EducationSection";
+import EducationSection from "@/components/feature/courses/EducationSection/EducationSection";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "Explore various educational lectures and resources.",
 };
 
-export default function Education() {
+export default function Page() {
   return <EducationSection />;
 }

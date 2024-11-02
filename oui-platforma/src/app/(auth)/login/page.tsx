@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "Log in to access your personalized dashboard and features.",
 };
 
-export default function Login() {
+export default function Page() {
   return (
     <Container maxHeight="100%" alignContent={"center"}>
       <LoginForm />

@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "View detailed information about the selected event.",
 };
 
-export default function EventID() {
+export default function Page() {
   return <EventInfo />;
 }

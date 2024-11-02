@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "Connect and collaborate with peers in the network.",
 };
 
-export default function PeerToPeer() {
+export default function Page() {
   return <PTPSection />;
 }

@@ -1,4 +1,4 @@
-import { MyProfile } from "@/components/feature/user/MyProfile/MyProfile";
+import MyProfile from "@/components/feature/user/MyProfile/MyProfile";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "View and edit your personal profile information.",
 };
 
-export default function Profile() {
+export default function Page() {
   return <MyProfile />;
 }

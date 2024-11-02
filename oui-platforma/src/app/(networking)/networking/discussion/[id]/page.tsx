@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "Explore detailed information about the discussion topic.",
 };
 
-export default function DiscussionID() {
+export default function Page() {
   return <DiscussionDetails />;
 }

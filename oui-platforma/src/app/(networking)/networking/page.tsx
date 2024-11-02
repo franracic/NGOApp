@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "Engage with the community and build connections.",
 };
 
-export default function Networking() {
+export default function Page() {
   return <NetworkSection />;
 }

@@ -7,7 +7,7 @@ import { Box, Flex, Heading, SimpleGrid } from "@chakra-ui/react";
 import useSWR from "swr";
 import { CourseCard } from "../CourseCard/CourseCard";
 
-export const EducationSection = () => {
+export default function EducationSection() {
   const { data: lectures, error: lecturesError } = useSWR(
     swrKeys.lectures,
     fetcher<ICourse[]>
@@ -55,4 +55,4 @@ export const EducationSection = () => {
       )}
     </Flex>
   );
-};
+}

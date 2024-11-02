@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "Find a collection of useful resources and guides.",
 };
 
-export default function Materials() {
+export default function Page() {
   return <ResourceLayout />;
 }

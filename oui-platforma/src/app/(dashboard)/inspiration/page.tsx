@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "Explore a collection of inspiring ideas and insights.",
 };
 
-export default function Inspiration() {
+export default function Page() {
   return <InspirationSection />;
 }

@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "Browse through our workshops and educational sessions.",
 };
 
-export default function Workshop() {
+export default function Page() {
   return <WorkshopSection />;
 }

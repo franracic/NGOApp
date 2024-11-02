@@ -5,6 +5,6 @@ export const metadata = {
   description: "This is the main dashboard page for users.",
 };
 
-export default function dashboardPage() {
+export default function Page() {
   return <Dashboard />;
 }

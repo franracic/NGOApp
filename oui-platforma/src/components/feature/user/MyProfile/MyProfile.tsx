@@ -13,7 +13,7 @@ import { ProfileDetails } from "./components/ProfileDetails";
 import { ProfileLinks } from "./components/ProfileLinks";
 import { UserProfileCard } from "./components/UserProfileCard";
 
-export const MyProfile = () => {
+export default function MyProfile() {
   const {
     data: user,
     mutate,
@@ -27,24 +27,19 @@ export const MyProfile = () => {
 
   if (error) return <div>Failed to load profile</div>;
   if (!user) return <div>Loading...</div>;
-  console.log(user);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    mutate({ ...user, [name]: value }, false);
-  };
-
-  const handleTagAddition = (tag: { id: string; text: string }) => {
-    const updatedInterests = [...(user.interests || []), tag.text];
-    mutate({ ...user, interests: updatedInterests }, false);
-  };
-
-  const handleTagDelete = (i: number) => {
-    const updatedInterests =
-      user.interests?.filter((_, index) => index !== i) || [];
-    mutate({ ...user, interests: updatedInterests }, false);
+    if (name === "interests") {
+      const interestsArray = value
+        .split(",")
+        .map((interest) => interest.trim());
+      mutate({ ...user, interests: interestsArray }, false);
+    } else {
+      mutate({ ...user, [name]: value }, false);
+    }
   };
 
   const handleSave = async () => {
@@ -106,8 +101,6 @@ export const MyProfile = () => {
     }
   };
 
-  if (!user) return null;
-
   const handleSaveCroppedImage = async (croppedImage: string) => {
     try {
       const blob = await (await fetch(croppedImage)).blob();
@@ -149,9 +142,9 @@ export const MyProfile = () => {
       flexDirection={"column"}
       p={4}
       bg={"transparent"}
-      maxH={"100vh"}
+      maxH={"90vh"}
     >
-      <SimpleGrid columns={[1, 2, 3]} spacing="6">
+      <SimpleGrid columns={[1, 2, 3]} gap="6">
         <Card gap={8} p={4}>
           <AvatarSection
             avatar={user.avatar || ""}
@@ -162,8 +155,6 @@ export const MyProfile = () => {
             user={user}
             isEditing={isEditing}
             handleInputChange={handleInputChange}
-            handleTagAddition={handleTagAddition}
-            handleTagDelete={handleTagDelete}
           />
           <ProfileLinks
             user={user}
@@ -195,4 +186,4 @@ export const MyProfile = () => {
       />
     </Box>
   );
-};
+}

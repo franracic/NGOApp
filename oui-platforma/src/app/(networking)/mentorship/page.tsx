@@ -7,6 +7,6 @@ export const metadata: Metadata = {
     "Explore our mentorship programs and connect with experienced mentors.",
 };
 
-export default function Mentorship() {
+export default function Page() {
   return <MentorshipSection />;
 }

@@ -144,7 +144,7 @@ export const NavigationMenu = ({ isOpen, onSelect }: NavigationMenuProps) => {
           );
 
         return (
-          <ChakraLink key={href} as={NextLink} href={href} passHref>
+          <ChakraLink key={href} as={NextLink} href={href}>
             <Tooltip
               label={tooltipContent}
               placement="right"

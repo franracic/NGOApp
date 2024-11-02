@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "Details and information about the selected group.",
 };
 
-export default function GroupID() {
+export default function Page() {
   return <GroupInfo />;
 }
