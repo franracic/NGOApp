@@ -5,6 +5,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
     User,
     IGroup,
+    GroupMessage,
     IActivity,
     Connection,
     ConnectionRequest,
@@ -52,18 +53,82 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ('groups', 'user_permissions')
 
 
+@admin.register(IGroup)
+class IGroupAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('name', 'description', 'logo_url')}),
+        ('Members', {'fields': ('members',)}),
+    )
+    list_display = ('name', 'description', 'member_count')
+    search_fields = ('name', 'description')
+    filter_horizontal = ('members',)
+
+    def member_count(self, obj):
+        return obj.members.count()
+    member_count.short_description = 'Member Count'
+
+
+@admin.register(GroupMessage)
+class GroupMessageAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('group', 'sender', 'content', 'sent_at')}),
+    )
+    list_display = ('group', 'sender', 'short_content', 'sent_at')
+    list_filter = ('group', 'sender', 'sent_at')
+    search_fields = ('group__name', 'sender__username', 'content')
+
+    def short_content(self, obj):
+        return obj.content[:50]
+    short_content.short_description = 'Content Preview'
+
+
 @admin.register(IActivity)
 class IActivityAdmin(admin.ModelAdmin):
     list_display = ('username', 'action', 'target', 'timestamp')
     list_filter = ('action', 'timestamp', 'username')
     search_fields = ('username', 'action', 'target')
 
+
+@admin.register(Connection)
+class ConnectionAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('user1', 'user2', 'connected_at')}),
+    )
+    list_display = ('user1', 'user2', 'connected_at')
+    search_fields = ('user1__username', 'user2__username')
+    list_filter = ('connected_at',)
+    ordering = ('-connected_at',)
+
+
+@admin.register(ConnectionRequest)
+class ConnectionRequestAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('sender', 'recipient', 'status', 'sent_at')}),
+    )
+    list_display = ('sender', 'recipient', 'status', 'sent_at')
+    search_fields = ('sender__username', 'recipient__username')
+    list_filter = ('status', 'sent_at')
+    ordering = ('-sent_at',)
+
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('sender', 'recipient', 'content', 'sent_at')}),
+    )
+    list_display = ('sender', 'recipient', 'short_content', 'sent_at')
+    search_fields = ('sender__username', 'recipient__username', 'content')
+    list_filter = ('sent_at',)
+    ordering = ('-sent_at',)
+
+    def short_content(self, obj):
+        return obj.content[:50]
+    short_content.short_description = 'Content Preview'
+
+
 @admin.register(MentorshipRequest)
 class MentorshipRequestAdmin(admin.ModelAdmin):
     list_display = ('sender', 'mentor', 'status', 'sent_at')
     list_filter = ('status', 'sent_at')
     search_fields = ('sender__username', 'mentor__username')
-
-admin.site.register(Connection)
-admin.site.register(ConnectionRequest)
-admin.site.register(Message)
+    ordering = ('-sent_at',)

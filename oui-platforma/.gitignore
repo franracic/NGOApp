@@ -9,6 +9,7 @@
 
 # testing
 /coverage
+.next.zip
 
 # next.js
 /.next/

@@ -7,7 +7,6 @@ import { ICourse } from "@/typings/course";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import useSWR from "swr";
-
 export default function Page() {
   const { id } = useParams() as { id: string };
 

@@ -13,8 +13,7 @@ from .serializers import (
     TrophyTemplateSerializer,
     UserTrophySerializer,
 )
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated
-from django.shortcuts import get_object_or_404
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 
 from rest_framework import viewsets, permissions
 from .models import Trophy, UserInput
@@ -41,14 +40,14 @@ class IResourceViewSet(viewsets.ModelViewSet):
             resource.likes.add(user)
             return Response({'status': 'resource liked'})
 
-    @action(detail=True, methods=['post'], permission_classes=[AllowAny])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def increment_views(self, request, pk=None):
         resource = self.get_object()
         resource.views += 1
         resource.save()
         return Response({'status': 'views incremented', 'views': resource.views})
     
-    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def get_multiple(self, request):
         ids = request.data.get('ids', [])
         if not ids:

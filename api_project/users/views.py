@@ -2,8 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import GroupMessage, MentorshipRequest, User, IGroup, IActivity
-from .serializers import GroupMessageSerializer, MentorshipRequestSerializer, UserSerializer, BasicUserSerializer, IGroupSerializer, IActivitySerializer
-from .filters import UserFilter
+from .serializers import GroupMessageSerializer, MentorshipRequestSerializer, UserSerializer, BasicUserSerializer, IActivitySerializer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.exceptions import PermissionDenied
@@ -14,10 +13,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token
-
 from rest_framework import generics
-from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
@@ -27,7 +23,6 @@ from .serializers import (
     UserSerializer,
     BasicUserSerializer,
     ConnectionRequestSerializer,
-    ConnectionSerializer,
     MessageSerializer,
 )
 from django.db.models import Q, Count, F
@@ -55,6 +50,7 @@ class UserViewSet(viewsets.ModelViewSet):
             Q(country__icontains=search_query) |
             Q(interests__icontains=search_query)
         ).exclude(id=self.request.user.id)
+    
     
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def available_mentors(self, request):
@@ -95,6 +91,24 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(mentor)
         return Response(serializer.data)
     
+    def update(self, request, *args, **kwargs):
+        print("request.FILES['avatar']:", request.FILES.get('avatar'))
+        avatar_file = request.FILES.get('avatar')
+        if avatar_file:
+            print("Avatar file content type:", avatar_file.content_type)
+            print("Avatar file size:", avatar_file.size)
+
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        
+        if not serializer.is_valid():
+            print("Validation errors:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+
 class GroupMessageViewSet(viewsets.ModelViewSet):
     queryset = GroupMessage.objects.all()
     serializer_class = GroupMessageSerializer
@@ -170,7 +184,6 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
-        request.data["name"] = request.data["username"]
         request.data["username"] = request.data["email"].split('@')[0]
 
         serializer = self.get_serializer(data=request.data)

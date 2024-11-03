@@ -15,6 +15,7 @@ class User(AbstractUser):
         (MENTOR, 'Mentor'),
         (ADMIN, 'Admin'),
         (PRACTITIONER, 'Practitioner'),
+        (BEGINNER, 'Beginner'),
     ]
 
     username_validator = RegexValidator(
@@ -32,7 +33,6 @@ class User(AbstractUser):
     )
     name = models.CharField(
         max_length=150,
-        validators=[username_validator],
         default='User'
     )
 
@@ -43,6 +43,7 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     
     interests = models.JSONField(null=True, blank=True)
+    dateOfBirth = models.DateField(null=True, blank=True)
     NGO = models.CharField(max_length=100, null=True, blank=True)
     city = models.CharField(max_length=100, null=True, blank=True)
     jobTitle = models.CharField(max_length=100, null=True, blank=True)

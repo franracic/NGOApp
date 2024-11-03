@@ -12,6 +12,7 @@ class UserCourseProgressSerializer(serializers.ModelSerializer):
         fields = ['is_unlocked', 'is_completed', 'progress', 'course']
 
 class BasicUserSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(required=False)
     class Meta:
         model = User
         fields = [
@@ -21,11 +22,18 @@ class BasicUserSerializer(serializers.ModelSerializer):
             'connectionsCount', 'isMentor', 'expertise', 'completed_courses_count',
             'submitted_resources_count', 'connections_count', 'login_streak', 'comment_count',
             'perfect_quizzes_count', 'liked_resources_count', 'viewed_resources_count',
-            'time_spent_learning', 'NGO', 'max_mentees', 'mentor'
+            'time_spent_learning', 'NGO', 'max_mentees', 'mentor', 'dateOfBirth'
         ]
-        
+
+    
+    def update(self, instance, validated_data):
+        print(validated_data, "aaaaaa")
+        return super().update(instance, validated_data)
+
+
 class UserSerializer(serializers.ModelSerializer):
     courses = serializers.SerializerMethodField()
+    avatar = serializers.ImageField(required=False)
 
     class Meta:
         model = User
@@ -37,13 +45,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         mentees_data = validated_data.pop('mentees', None)
-        
         user = super(UserSerializer, self).create(validated_data)
         
         if mentees_data:
             user.mentees.set(mentees_data)
         
         return user
+    
+    def get_courses(self, obj):
+        progress = UserCourseProgress.objects.filter(user=obj).values_list('course', flat=True)
+        return list(progress)
     
     def update_time_spent(user, time_spent):
         user.time_spent_learning += time_spent
@@ -67,6 +78,12 @@ class UserSerializer(serializers.ModelSerializer):
     def get_courses(self, obj):
         progress = UserCourseProgress.objects.filter(user=obj).values_list('course', flat=True)
         return list(progress)
+    
+    def update(self, instance, validated_data):
+        print("aaaaaa")
+        instance = super().update(instance, validated_data)
+        return instance
+    
 
 class IGroupSerializer(serializers.ModelSerializer):
     members = BasicUserSerializer(many=True, read_only=True)
