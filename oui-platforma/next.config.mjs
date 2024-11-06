@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "oui.hr",
+        hostname: "platform.oui.hr",
         port: "",
         pathname: "/wp-content/uploads/**",
       },
