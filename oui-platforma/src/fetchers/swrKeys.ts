@@ -1,4 +1,4 @@
-const apiUrl = "http://localhost:8000/api";
+const apiUrl = "http://api.platform.oui.hr/api";
 
 export const swrKeys = {
   register: `${apiUrl}/users/register/`,
