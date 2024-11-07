@@ -1,4 +1,4 @@
-const apiUrl = "https://api.platform.oui.hr/api";
+const apiUrl = "https://zenzonemedia.com/platform/api";
 
 export const swrKeys = {
   register: `${apiUrl}/users/register/`,
