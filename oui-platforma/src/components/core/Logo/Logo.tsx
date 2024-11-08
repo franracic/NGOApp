@@ -8,7 +8,7 @@ interface LogoImageProps
 export const LogoImage = (props: LogoImageProps) => {
   return (
     <Image
-      src={"https://oui.hr/wp-content/uploads/2021/01/logoOUI..png"}
+      src={"/platform/media/logoOUI.png"}
       alt="Logo"
       height={50}
       width={50}
