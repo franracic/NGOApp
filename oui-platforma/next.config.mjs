@@ -8,7 +8,21 @@ const nextConfig = {
         port: "",
         pathname: "/wp-content/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "zenzonemedia.com",
+        port: "",
+        pathname: "/platform/media/**",
+      },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/platform/media/:path*',
+        destination: 'https://zenzonemedia.com/platform/media/:path*',
+      },
+    ];
   },
 };
 
