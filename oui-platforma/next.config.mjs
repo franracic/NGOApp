@@ -20,7 +20,7 @@ const nextConfig = {
     return [
       {
         source: '/platform/media/:path*',
-        destination: 'https://zenzonemedia.com/platform/media/:path*',
+        destination: 'https://api.platform.zenzonemedia.com/platform/media/:path*',
       },
     ];
   },
